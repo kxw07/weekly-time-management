@@ -34,3 +34,6 @@ its function is clear all fields content.
 ## 7
 add a little button on the top right side, named: "export" ,
 its function is export table as a png picture.
+
+## 8
+always export all table content, not just the screen.

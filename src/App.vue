@@ -122,10 +122,26 @@ export default {
     async exportToPng() {
       try {
         const element = this.$refs.tableContainer;
+
+        // Store original overflow style
+        const originalOverflow = element.style.overflow;
+
+        // Temporarily remove overflow to capture full content
+        element.style.overflow = 'visible';
+
         const canvas = await html2canvas(element, {
           backgroundColor: '#ffffff',
-          scale: 2
+          scale: 2,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
+          width: element.scrollWidth,
+          height: element.scrollHeight
         });
+
+        // Restore original overflow
+        element.style.overflow = originalOverflow;
 
         // Convert canvas to blob and download
         canvas.toBlob((blob) => {
