@@ -6,13 +6,16 @@
 - export: png, json
 - import: json
 
-## 3. better RWD
-- desktop, mobile
-- table
-- button
+## 3. content time summary
+- summarize by different content
 
 ## 4. cache in broswer storage
 - refresh page can load data from cache
 
-## 5. deploy to firebase
+## 5. better RWD
+- desktop, mobile
+- table
+- button
+
+## 6. deploy to firebase
 - public access
