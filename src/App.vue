@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <h1>Weekly Time Management</h1>
+    <div class="header">
+      <h1>Weekly Time Management</h1>
+      <button class="clear-btn" @click="clearAll">Clear All</button>
+    </div>
     <div class="table-container">
       <table class="time-table">
         <thead>
@@ -102,6 +105,14 @@ export default {
       // Save to localStorage
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
       localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
+    },
+    clearAll() {
+      if (confirm('Are you sure you want to clear all content?')) {
+        this.cellData = {};
+        this.contentColorMap = {};
+        localStorage.removeItem('weeklyTimeData');
+        localStorage.removeItem('weeklyTimeColors');
+      }
     }
   },
   mounted() {
@@ -134,10 +145,38 @@ export default {
   overflow-x: auto;
 }
 
-h1 {
-  text-align: center;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+h1 {
   color: #333;
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.clear-btn {
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.clear-btn:hover {
+  background-color: #d32f2f;
+}
+
+.clear-btn:active {
+  background-color: #c62828;
 }
 
 .table-container {

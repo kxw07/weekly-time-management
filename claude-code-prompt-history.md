@@ -26,3 +26,7 @@ all background color should not be too bright.
 ## 5
 use same color when fields content are same,
 and do not use duplicated color.
+
+## 6
+add a little button on the top right side and named: "clear all" ,
+its function is clear all fields content.
