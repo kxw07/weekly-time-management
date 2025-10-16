@@ -17,6 +17,7 @@
               :key="`${day}-${hour}`"
               class="time-cell"
               contenteditable="true"
+              :style="{ backgroundColor: getCellColor(day, hour) }"
               @blur="saveCellContent($event, day, hour)"
               @keydown.enter.prevent="$event.target.blur()"
             >{{ getCellContent(day, hour) }}</td>
@@ -34,7 +35,22 @@ export default {
     return {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       hours: Array.from({ length: 24 }, (_, i) => i),
-      cellData: {}
+      cellData: {},
+      cellColors: {},
+      colorPalette: [
+        '#B8D4E8', // Soft blue
+        '#C8E6C9', // Soft green
+        '#FFE0B2', // Soft orange
+        '#F8BBD0', // Soft pink
+        '#D1C4E9', // Soft purple
+        '#FFCCBC', // Soft coral
+        '#B2DFDB', // Soft teal
+        '#FFF9C4', // Soft yellow
+        '#E1BEE7', // Soft lavender
+        '#DCEDC8', // Soft lime
+        '#FFECB3', // Soft amber
+        '#CFD8DC'  // Soft blue grey
+      ]
     };
   },
   methods: {
@@ -42,13 +58,36 @@ export default {
       const key = `${day}-${hour}`;
       return this.cellData[key] || '';
     },
+    getCellColor(day, hour) {
+      const key = `${day}-${hour}`;
+      const content = this.cellData[key];
+
+      // Only return color if cell has content
+      if (content && content.trim() !== '') {
+        return this.cellColors[key] || 'transparent';
+      }
+      return 'transparent';
+    },
+    getRandomColor() {
+      const randomIndex = Math.floor(Math.random() * this.colorPalette.length);
+      return this.colorPalette[randomIndex];
+    },
     saveCellContent(event, day, hour) {
       const key = `${day}-${hour}`;
       const content = event.target.innerText.trim();
       this.cellData[key] = content;
 
+      // Assign random color if content exists and no color assigned yet
+      if (content !== '' && !this.cellColors[key]) {
+        this.cellColors[key] = this.getRandomColor();
+      } else if (content === '') {
+        // Remove color if content is cleared
+        delete this.cellColors[key];
+      }
+
       // Save to localStorage
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.cellColors));
     }
   },
   mounted() {
@@ -56,6 +95,12 @@ export default {
     const savedData = localStorage.getItem('weeklyTimeData');
     if (savedData) {
       this.cellData = JSON.parse(savedData);
+    }
+
+    // Load colors from localStorage
+    const savedColors = localStorage.getItem('weeklyTimeColors');
+    if (savedColors) {
+      this.cellColors = JSON.parse(savedColors);
     }
   }
 };

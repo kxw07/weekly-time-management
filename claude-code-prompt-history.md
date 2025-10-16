@@ -18,3 +18,7 @@ Pre-transform error: Failed to parse source for import analysis because the cont
 
 ## 3
 make user can edit fields, but exclude first row and column.
+
+## 4
+after user edit the field, it would randomly attach color in background,
+all background color should not be too bright.
