@@ -2,9 +2,12 @@
   <div id="app">
     <div class="header">
       <h1>Weekly Time Management</h1>
-      <button class="clear-btn" @click="clearAll">Clear All</button>
+      <div class="button-group">
+        <button class="export-btn" @click="exportToPng">Export</button>
+        <button class="clear-btn" @click="clearAll">Clear All</button>
+      </div>
     </div>
-    <div class="table-container">
+    <div class="table-container" ref="tableContainer">
       <table class="time-table">
         <thead>
           <tr>
@@ -32,6 +35,8 @@
 </template>
 
 <script>
+import html2canvas from 'html2canvas';
+
 export default {
   name: 'App',
   data() {
@@ -113,6 +118,29 @@ export default {
         localStorage.removeItem('weeklyTimeData');
         localStorage.removeItem('weeklyTimeColors');
       }
+    },
+    async exportToPng() {
+      try {
+        const element = this.$refs.tableContainer;
+        const canvas = await html2canvas(element, {
+          backgroundColor: '#ffffff',
+          scale: 2
+        });
+
+        // Convert canvas to blob and download
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const date = new Date().toISOString().split('T')[0];
+          link.download = `weekly-time-management-${date}.png`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+      } catch (error) {
+        console.error('Error exporting to PNG:', error);
+        alert('Failed to export table. Please try again.');
+      }
     }
   },
   mounted() {
@@ -157,6 +185,31 @@ h1 {
   margin: 0;
   flex-grow: 1;
   text-align: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.export-btn {
+  padding: 8px 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.export-btn:hover {
+  background-color: #1976D2;
+}
+
+.export-btn:active {
+  background-color: #1565C0;
 }
 
 .clear-btn {

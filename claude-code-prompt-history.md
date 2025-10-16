@@ -30,3 +30,7 @@ and do not use duplicated color.
 ## 6
 add a little button on the top right side and named: "clear all" ,
 its function is clear all fields content.
+
+## 7
+add a little button on the top right side, named: "export" ,
+its function is export table as a png picture.
