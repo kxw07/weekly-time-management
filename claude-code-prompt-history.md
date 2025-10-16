@@ -22,3 +22,7 @@ make user can edit fields, but exclude first row and column.
 ## 4
 after user edit the field, it would randomly attach color in background,
 all background color should not be too bright.
+
+## 5
+use same color when fields content are same,
+and do not use duplicated color.

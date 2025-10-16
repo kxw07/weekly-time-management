@@ -36,7 +36,7 @@ export default {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       hours: Array.from({ length: 24 }, (_, i) => i),
       cellData: {},
-      cellColors: {},
+      contentColorMap: {}, // Maps content text to color
       colorPalette: [
         '#B8D4E8', // Soft blue
         '#C8E6C9', // Soft green
@@ -59,35 +59,49 @@ export default {
       return this.cellData[key] || '';
     },
     getCellColor(day, hour) {
-      const key = `${day}-${hour}`;
-      const content = this.cellData[key];
+      const content = this.cellData[`${day}-${hour}`];
 
       // Only return color if cell has content
       if (content && content.trim() !== '') {
-        return this.cellColors[key] || 'transparent';
+        return this.contentColorMap[content] || 'transparent';
       }
       return 'transparent';
     },
-    getRandomColor() {
-      const randomIndex = Math.floor(Math.random() * this.colorPalette.length);
-      return this.colorPalette[randomIndex];
+    getAvailableColor() {
+      // Get all currently used colors
+      const usedColors = Object.values(this.contentColorMap);
+
+      // Find first unused color
+      const availableColor = this.colorPalette.find(color => !usedColors.includes(color));
+
+      // If all colors are used, return a random one
+      return availableColor || this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     },
     saveCellContent(event, day, hour) {
       const key = `${day}-${hour}`;
       const content = event.target.innerText.trim();
+      const oldContent = this.cellData[key];
+
       this.cellData[key] = content;
 
-      // Assign random color if content exists and no color assigned yet
-      if (content !== '' && !this.cellColors[key]) {
-        this.cellColors[key] = this.getRandomColor();
-      } else if (content === '') {
-        // Remove color if content is cleared
-        delete this.cellColors[key];
+      if (content !== '') {
+        // If this content doesn't have a color yet, assign one
+        if (!this.contentColorMap[content]) {
+          this.contentColorMap[content] = this.getAvailableColor();
+        }
+      }
+
+      // Clean up: remove color mapping if no cells use this old content anymore
+      if (oldContent && oldContent !== content) {
+        const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
+        if (!stillUsed) {
+          delete this.contentColorMap[oldContent];
+        }
       }
 
       // Save to localStorage
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
-      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.cellColors));
+      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
     }
   },
   mounted() {
@@ -100,7 +114,7 @@ export default {
     // Load colors from localStorage
     const savedColors = localStorage.getItem('weeklyTimeColors');
     if (savedColors) {
-      this.cellColors = JSON.parse(savedColors);
+      this.contentColorMap = JSON.parse(savedColors);
     }
   }
 };
