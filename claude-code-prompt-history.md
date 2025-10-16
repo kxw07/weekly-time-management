@@ -15,3 +15,6 @@ Pre-transform error: Failed to parse source for import analysis because the cont
      |                                     ^
   4  |      <div class="table-container">
   5  |        <table class="time-table">
+
+## 3
+make user can edit fields, but exclude first row and column.

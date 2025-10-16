@@ -12,7 +12,14 @@
         <tbody>
           <tr v-for="hour in hours" :key="hour">
             <td class="hour-cell">{{ hour }}</td>
-            <td v-for="day in days" :key="`${day}-${hour}`" class="time-cell"></td>
+            <td
+              v-for="day in days"
+              :key="`${day}-${hour}`"
+              class="time-cell"
+              contenteditable="true"
+              @blur="saveCellContent($event, day, hour)"
+              @keydown.enter.prevent="$event.target.blur()"
+            >{{ getCellContent(day, hour) }}</td>
           </tr>
         </tbody>
       </table>
@@ -26,8 +33,30 @@ export default {
   data() {
     return {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      hours: Array.from({ length: 24 }, (_, i) => i)
+      hours: Array.from({ length: 24 }, (_, i) => i),
+      cellData: {}
     };
+  },
+  methods: {
+    getCellContent(day, hour) {
+      const key = `${day}-${hour}`;
+      return this.cellData[key] || '';
+    },
+    saveCellContent(event, day, hour) {
+      const key = `${day}-${hour}`;
+      const content = event.target.innerText.trim();
+      this.cellData[key] = content;
+
+      // Save to localStorage
+      localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+    }
+  },
+  mounted() {
+    // Load data from localStorage on mount
+    const savedData = localStorage.getItem('weeklyTimeData');
+    if (savedData) {
+      this.cellData = JSON.parse(savedData);
+    }
   }
 };
 </script>
@@ -95,11 +124,19 @@ h1 {
 .time-cell {
   min-width: 100px;
   height: 40px;
-  cursor: pointer;
+  cursor: text;
   transition: background-color 0.2s;
+  padding: 8px;
+  vertical-align: top;
+  text-align: left;
 }
 
 .time-cell:hover {
   background-color: #f0f0f0;
+}
+
+.time-cell:focus {
+  outline: 2px solid #4CAF50;
+  background-color: #fff;
 }
 </style>
