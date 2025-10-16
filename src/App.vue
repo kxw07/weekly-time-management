@@ -3,7 +3,16 @@
     <div class="header">
       <h1>Weekly Time Management</h1>
       <div class="button-group">
-        <button class="export-btn" @click="exportToPng">Export</button>
+        <button class="export-btn" @click="exportToPng">Export PNG</button>
+        <button class="export-json-btn" @click="exportToJson">Export JSON</button>
+        <button class="import-json-btn" @click="triggerImportJson">Import JSON</button>
+        <input
+          type="file"
+          ref="fileInput"
+          @change="importFromJson"
+          accept=".json"
+          style="display: none;"
+        />
         <button class="clear-btn" @click="clearAll">Clear All</button>
       </div>
     </div>
@@ -157,6 +166,63 @@ export default {
         console.error('Error exporting to PNG:', error);
         alert('Failed to export table. Please try again.');
       }
+    },
+    exportToJson() {
+      try {
+        const data = {
+          cellData: this.cellData,
+          contentColorMap: this.contentColorMap,
+          exportDate: new Date().toISOString()
+        };
+
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const date = new Date().toISOString().split('T')[0];
+        link.download = `weekly-time-management-${date}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error exporting to JSON:', error);
+        alert('Failed to export JSON. Please try again.');
+      }
+    },
+    triggerImportJson() {
+      this.$refs.fileInput.click();
+    },
+    importFromJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+
+          if (data.cellData && data.contentColorMap) {
+            this.cellData = data.cellData;
+            this.contentColorMap = data.contentColorMap;
+
+            // Save to localStorage
+            localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+            localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
+
+            alert('JSON data imported successfully!');
+          } else {
+            alert('Invalid JSON format. Please use a file exported from this application.');
+          }
+        } catch (error) {
+          console.error('Error importing JSON:', error);
+          alert('Failed to import JSON. Please check the file format.');
+        }
+
+        // Reset file input
+        event.target.value = '';
+      };
+
+      reader.readAsText(file);
     }
   },
   mounted() {
@@ -226,6 +292,46 @@ h1 {
 
 .export-btn:active {
   background-color: #1565C0;
+}
+
+.export-json-btn {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.export-json-btn:hover {
+  background-color: #45a049;
+}
+
+.export-json-btn:active {
+  background-color: #3d8b40;
+}
+
+.import-json-btn {
+  padding: 8px 16px;
+  background-color: #FF9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.import-json-btn:hover {
+  background-color: #F57C00;
+}
+
+.import-json-btn:active {
+  background-color: #E65100;
 }
 
 .clear-btn {

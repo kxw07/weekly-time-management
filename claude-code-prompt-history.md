@@ -37,3 +37,9 @@ its function is export table as a png picture.
 
 ## 8
 always export all table content, not just the screen.
+
+## 9
+modify button "Export" to "Export PNG",
+and add another two buttons on the top right side,
+one is "Export JSON", its function is export content as json format file,
+the other is "Import JSON", its function is import json file from "Export JSON"'s output.
