@@ -43,3 +43,10 @@ modify button "Export" to "Export PNG",
 and add another two buttons on the top right side,
 one is "Export JSON", its function is export content as json format file,
 the other is "Import JSON", its function is import json file from "Export JSON"'s output.
+
+## 10
+Now, I want to create a area at the footer,
+which summarize different field content and sort by bigger time block,
+and shows like:
+Sleep: 5 hr
+Reading: 4 hr
