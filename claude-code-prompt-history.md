@@ -151,3 +151,7 @@ imagine you are mobile user, how to improve for better UX, and use dark gray for
 
 ## 26
 scroll bar is still bad, think a new way to satisfy UX.
+
+## 27
+the shadow's effect is not good, restore it.
+and I think we just add two buttons: "left" and "right" to help user move table view.

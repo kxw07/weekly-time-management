@@ -1,6 +1,8 @@
 <template>
-  <div class="table-container" ref="tableContainer">
-    <table class="time-table">
+  <div class="table-wrapper">
+    <button class="scroll-btn scroll-left" @click="scrollLeft" aria-label="Scroll left">‹</button>
+    <div class="table-container" ref="tableContainer">
+      <table class="time-table">
       <thead>
         <tr>
           <th class="hour-header">Hour</th>
@@ -29,7 +31,9 @@
         </tr>
       </tbody>
     </table>
-    <InputDialog ref="inputDialog" />
+      <InputDialog ref="inputDialog" />
+    </div>
+    <button class="scroll-btn scroll-right" @click="scrollRight" aria-label="Scroll right">›</button>
   </div>
 </template>
 
@@ -261,6 +265,18 @@ export default {
       this.cellData = {};
       this.contentColorMap = {};
       this.emitDataChange();
+    },
+    scrollLeft() {
+      const container = this.$refs.tableContainer;
+      if (container) {
+        container.scrollBy({ left: -200, behavior: 'smooth' });
+      }
+    },
+    scrollRight() {
+      const container = this.$refs.tableContainer;
+      if (container) {
+        container.scrollBy({ left: 200, behavior: 'smooth' });
+      }
     }
   },
   mounted() {
@@ -273,11 +289,48 @@ export default {
 </script>
 
 <style scoped>
+.table-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.scroll-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.1s;
+  user-select: none;
+  line-height: 1;
+}
+
+.scroll-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.scroll-btn:active {
+  background-color: #3d8b40;
+  transform: scale(0.95);
+}
+
 .table-container {
+  flex: 1;
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  position: relative;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
@@ -290,28 +343,6 @@ export default {
 .table-container {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Add shadow indicators to show scrollable content */
-.table-container::before,
-.table-container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 30px;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.table-container::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0));
-}
-
-.table-container::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
 }
 
 .time-table {
