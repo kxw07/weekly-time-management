@@ -279,6 +279,30 @@ export default {
   border-radius: 8px;
 }
 
+/* Thicker scrollbar for better mobile UX */
+.table-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* For Firefox */
+.table-container {
+  scrollbar-width: auto;
+  scrollbar-color: #888 #f1f1f1;
+}
+
 .time-table {
   width: 100%;
   border-collapse: collapse;
@@ -303,8 +327,9 @@ export default {
 }
 
 .hour-header {
-  background-color: #45a049;
+  background-color: #f9f9f9;
   min-width: 60px;
+  color: #666;
 }
 
 .hour-cell {

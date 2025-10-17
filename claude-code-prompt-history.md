@@ -125,3 +125,18 @@ we want to better user experience, here are some operation we should modify,
 1. use self component enter field content instead of native alert window.
 2. fix select and drag when using moblie phone.
 3. reduce margin size, we should do our better to show more content.
+
+## 20 -> bad prompt, didn't adjust
+we should do some improvements,
+1. add table's scroll bar instead of native scroll bar.
+2. Change table's first column "Hour"'s background color to gray, same with hour 0-23.
+
+## 21
+restore last modification
+
+## 22
+restore last scroll bar's modification
+
+## 23
+1. change table's first column's first field background color to the same with first column's other row, it looks like gray, more accurate, the field's content is "Hour", I mean the field we need to change.
+2. make the table's horizontal scroll bar more thicker, it would be good for mobile user.
