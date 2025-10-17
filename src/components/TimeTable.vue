@@ -477,9 +477,13 @@ export default {
 .table-container {
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  border: 1px solid #ddd;
+}
+
+.table-wrapper.dark-mode .table-container {
+  border-color: #555;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -593,12 +597,18 @@ export default {
   color: #e0e0e0;
 }
 
+.table-wrapper.dark-mode .time-cell {
+  color: #e0e0e0;
+}
+
 .table-wrapper.dark-mode .time-cell:hover {
   background-color: #3a3a3a;
+  color: #e0e0e0;
 }
 
 .table-wrapper.dark-mode .time-cell:focus {
   outline: 2px solid #4CAF50;
   background-color: #2b2b2b;
+  color: #e0e0e0;
 }
 </style>

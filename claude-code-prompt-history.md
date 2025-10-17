@@ -183,3 +183,7 @@ let user can edit "Time Summary"'s field name, and it would adjust back to table
 ## 33
 1. dark light mode should adjust all page, and make its color a little different from each page block.
 2. modify "Time Summary"s field, it should show inputDialog too.
+
+## 34
+1. reset table's four corners css effect, treat them just like other table boundary.
+2. fix the font's color when enable dark mode.
