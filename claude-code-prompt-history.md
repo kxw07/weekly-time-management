@@ -160,3 +160,6 @@ and I think we just add two buttons: "left" and "right" to help user move table 
 looks good,
 I want to move table view buttons below the table,
 and make its color more transparenter and fit table's color.
+
+## 29
+table view button should return to previous state after press.

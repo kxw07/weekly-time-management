@@ -268,17 +268,19 @@ export default {
       this.contentColorMap = {};
       this.emitDataChange();
     },
-    scrollLeft() {
+    scrollLeft(event) {
       const container = this.$refs.tableContainer;
       if (container) {
         container.scrollBy({ left: -200, behavior: 'smooth' });
       }
+      event.target.blur();
     },
-    scrollRight() {
+    scrollRight(event) {
       const container = this.$refs.tableContainer;
       if (container) {
         container.scrollBy({ left: 200, behavior: 'smooth' });
       }
+      event.target.blur();
     }
   },
   mounted() {
