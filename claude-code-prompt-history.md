@@ -77,3 +77,6 @@ All unit tests are successful, that's weird,
 I found you didn't move bussiness logic into their component,
 let's modify.
 after modification, our unit tests should have some errors.
+
+## 16
+fix unit tests, and do not modify production code.
