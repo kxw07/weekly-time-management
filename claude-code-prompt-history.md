@@ -144,3 +144,7 @@ restore last scroll bar's modification
 ## 24
 1. the field "Hour"'s background is not gray, fix it.
 2. and make table's horizontal scroll bar more obvious.
+
+## 25
+the table's horizontal scroll bar is still not good,
+imagine you are mobile user, how to improve for better UX, and use dark gray for it, not green.

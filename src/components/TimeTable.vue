@@ -279,30 +279,35 @@ export default {
   border-radius: 8px;
 }
 
-/* Thicker and more obvious scrollbar for mobile UX */
+/* Mobile-friendly scrollbar - thick and always visible */
 .table-container::-webkit-scrollbar {
-  height: 14px;
+  height: 20px;
 }
 
 .table-container::-webkit-scrollbar-track {
-  background: #e0e0e0;
-  border: 1px solid #d0d0d0;
+  background: #f5f5f5;
+  border-top: 2px solid #ddd;
 }
 
 .table-container::-webkit-scrollbar-thumb {
-  background: #4CAF50;
-  border-radius: 7px;
-  border: 2px solid #e0e0e0;
+  background: #424242;
+  border-radius: 10px;
+  border: 3px solid #f5f5f5;
+  min-width: 50px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: #45a049;
+  background: #212121;
+}
+
+.table-container::-webkit-scrollbar-thumb:active {
+  background: #000;
 }
 
 /* For Firefox */
 .table-container {
-  scrollbar-width: auto;
-  scrollbar-color: #4CAF50 #e0e0e0;
+  scrollbar-width: thick;
+  scrollbar-color: #424242 #f5f5f5;
 }
 
 .time-table {
