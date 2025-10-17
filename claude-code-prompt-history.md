@@ -71,3 +71,9 @@ make an example: same field content should have same background color, time summ
 we should refactor now,
 split App.vue to different components: title, table, time summary, actions.
 And do not modify unit tests, let them failed, it's okay.
+
+## 15
+All unit tests are successful, that's weird,
+I found you didn't move bussiness logic into their component,
+let's modify.
+after modification, our unit tests should have some errors.

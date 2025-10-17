@@ -1,9 +1,9 @@
 <template>
-  <div class="footer-summary" v-if="summary.length > 0">
+  <div class="footer-summary" v-if="timeSummary.length > 0">
     <h2>Time Summary</h2>
     <div class="summary-items">
       <div
-        v-for="item in summary"
+        v-for="item in timeSummary"
         :key="item.field"
         class="summary-item"
         :style="{ backgroundColor: item.color }"
@@ -19,9 +19,32 @@
 export default {
   name: 'TimeSummary',
   props: {
-    summary: {
-      type: Array,
+    cellData: {
+      type: Object,
       required: true
+    },
+    contentColorMap: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    timeSummary() {
+      const summary = {};
+
+      Object.values(this.cellData).forEach(content => {
+        if (content && content.trim() !== '') {
+          summary[content] = (summary[content] || 0) + 1;
+        }
+      });
+
+      return Object.entries(summary)
+        .map(([field, count]) => ({
+          field,
+          count,
+          color: this.contentColorMap[field] || 'transparent'
+        }))
+        .sort((a, b) => b.count - a.count);
     }
   }
 };

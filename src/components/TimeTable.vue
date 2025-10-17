@@ -17,9 +17,9 @@
             :class="{ 'selected': isCellSelected(day, hour) }"
             contenteditable="true"
             :style="{ backgroundColor: getCellColor(day, hour) }"
-            @mousedown="handleMouseDown(day, hour, $event)"
-            @mouseenter="handleMouseEnter(day, hour)"
-            @blur="handleBlur($event, day, hour)"
+            @mousedown="startSelection(day, hour, $event)"
+            @mouseenter="updateSelection(day, hour)"
+            @blur="saveCellContent($event, day, hour)"
             @keydown.enter.prevent="$event.target.blur()"
           >{{ getCellContent(day, hour) }}</td>
         </tr>
@@ -40,20 +40,54 @@ export default {
       type: Array,
       required: true
     },
-    cellData: {
+    initialCellData: {
       type: Object,
-      required: true
+      default: () => ({})
     },
-    contentColorMap: {
+    initialContentColorMap: {
       type: Object,
-      required: true
-    },
-    selectedCells: {
-      type: Array,
-      required: true
+      default: () => ({})
     }
   },
-  emits: ['cell-blur', 'selection-start', 'selection-update'],
+  emits: ['data-change'],
+  data() {
+    return {
+      cellData: { ...this.initialCellData },
+      contentColorMap: { ...this.initialContentColorMap },
+      isSelecting: false,
+      selectionStart: null,
+      selectionEnd: null,
+      selectedCells: [],
+      colorPalette: [
+        '#B8D4E8',
+        '#C8E6C9',
+        '#FFE0B2',
+        '#F8BBD0',
+        '#D1C4E9',
+        '#FFCCBC',
+        '#B2DFDB',
+        '#FFF9C4',
+        '#E1BEE7',
+        '#DCEDC8',
+        '#FFECB3',
+        '#CFD8DC'
+      ]
+    };
+  },
+  watch: {
+    initialCellData: {
+      handler(newVal) {
+        this.cellData = { ...newVal };
+      },
+      deep: true
+    },
+    initialContentColorMap: {
+      handler(newVal) {
+        this.contentColorMap = { ...newVal };
+      },
+      deep: true
+    }
+  },
   methods: {
     getCellContent(day, hour) {
       const key = `${day}-${hour}`;
@@ -70,15 +104,128 @@ export default {
     isCellSelected(day, hour) {
       return this.selectedCells.some(cell => cell.day === day && cell.hour === hour);
     },
-    handleMouseDown(day, hour, event) {
-      this.$emit('selection-start', day, hour, event);
+    getAvailableColor() {
+      const usedColors = Object.values(this.contentColorMap);
+      const availableColor = this.colorPalette.find(color => !usedColors.includes(color));
+      return availableColor || this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     },
-    handleMouseEnter(day, hour) {
-      this.$emit('selection-update', day, hour);
+    startSelection(day, hour, event) {
+      if (event.button !== 0) return;
+
+      this.isSelecting = true;
+      this.selectionStart = { day, hour };
+      this.selectionEnd = { day, hour };
+      this.updateSelectedCells();
+      event.preventDefault();
     },
-    handleBlur(event, day, hour) {
-      this.$emit('cell-blur', event, day, hour);
+    updateSelection(day, hour) {
+      if (!this.isSelecting) return;
+
+      this.selectionEnd = { day, hour };
+      this.updateSelectedCells();
+    },
+    endSelection() {
+      if (!this.isSelecting) return;
+
+      this.isSelecting = false;
+
+      if (this.selectedCells.length > 0) {
+        const content = prompt(`Enter content for ${this.selectedCells.length} selected cells:`);
+        if (content !== null) {
+          this.applyContentToSelection(content.trim());
+        }
+      }
+
+      this.selectedCells = [];
+      this.selectionStart = null;
+      this.selectionEnd = null;
+    },
+    updateSelectedCells() {
+      if (!this.selectionStart || !this.selectionEnd) {
+        this.selectedCells = [];
+        return;
+      }
+
+      const startDayIndex = this.days.indexOf(this.selectionStart.day);
+      const endDayIndex = this.days.indexOf(this.selectionEnd.day);
+      const minDayIndex = Math.min(startDayIndex, endDayIndex);
+      const maxDayIndex = Math.max(startDayIndex, endDayIndex);
+
+      const minHour = Math.min(this.selectionStart.hour, this.selectionEnd.hour);
+      const maxHour = Math.max(this.selectionStart.hour, this.selectionEnd.hour);
+
+      const selected = [];
+      for (let dayIndex = minDayIndex; dayIndex <= maxDayIndex; dayIndex++) {
+        for (let hour = minHour; hour <= maxHour; hour++) {
+          selected.push({
+            day: this.days[dayIndex],
+            hour
+          });
+        }
+      }
+
+      this.selectedCells = selected;
+    },
+    applyContentToSelection(content) {
+      this.selectedCells.forEach(({ day, hour }) => {
+        const key = `${day}-${hour}`;
+        const oldContent = this.cellData[key];
+
+        this.cellData[key] = content;
+
+        if (content !== '' && !this.contentColorMap[content]) {
+          this.contentColorMap[content] = this.getAvailableColor();
+        }
+
+        if (oldContent && oldContent !== content) {
+          const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
+          if (!stillUsed) {
+            delete this.contentColorMap[oldContent];
+          }
+        }
+      });
+
+      this.emitDataChange();
+    },
+    saveCellContent(event, day, hour) {
+      const key = `${day}-${hour}`;
+      const content = event.target.innerText.trim();
+      const oldContent = this.cellData[key];
+
+      this.cellData[key] = content;
+
+      if (content !== '') {
+        if (!this.contentColorMap[content]) {
+          this.contentColorMap[content] = this.getAvailableColor();
+        }
+      }
+
+      if (oldContent && oldContent !== content) {
+        const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
+        if (!stillUsed) {
+          delete this.contentColorMap[oldContent];
+        }
+      }
+
+      this.emitDataChange();
+    },
+    emitDataChange() {
+      this.$emit('data-change', {
+        cellData: this.cellData,
+        contentColorMap: this.contentColorMap
+      });
+    },
+    clearData() {
+      this.cellData = {};
+      this.contentColorMap = {};
+      this.emitDataChange();
     }
+  },
+  mounted() {
+    window.addEventListener('mouseup', this.endSelection);
+  },
+  beforeUnmount() {
+    window.removeEventListener('mouseup', this.endSelection);
   }
 };
 </script>

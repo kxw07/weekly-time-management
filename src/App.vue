@@ -1,18 +1,18 @@
 <template>
-  <div id="app" @mouseup="endSelection">
+  <div id="app">
     <PageTitle />
     <TimeTable
-      ref="tableContainer"
+      ref="timeTable"
       :days="days"
       :hours="hours"
+      :initial-cell-data="cellData"
+      :initial-content-color-map="contentColorMap"
+      @data-change="handleDataChange"
+    />
+    <TimeSummary
       :cell-data="cellData"
       :content-color-map="contentColorMap"
-      :selected-cells="selectedCells"
-      @cell-blur="saveCellContent"
-      @selection-start="startSelection"
-      @selection-update="updateSelection"
     />
-    <TimeSummary :summary="timeSummary" />
     <Actions
       @export-png="exportToPng"
       @export-json="exportToJson"
@@ -42,182 +42,26 @@ export default {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       hours: Array.from({ length: 24 }, (_, i) => i),
       cellData: {},
-      contentColorMap: {},
-      isSelecting: false,
-      selectionStart: null,
-      selectionEnd: null,
-      selectedCells: [],
-      colorPalette: [
-        '#B8D4E8',
-        '#C8E6C9',
-        '#FFE0B2',
-        '#F8BBD0',
-        '#D1C4E9',
-        '#FFCCBC',
-        '#B2DFDB',
-        '#FFF9C4',
-        '#E1BEE7',
-        '#DCEDC8',
-        '#FFECB3',
-        '#CFD8DC'
-      ]
+      contentColorMap: {}
     };
   },
-  computed: {
-    timeSummary() {
-      const summary = {};
-
-      Object.values(this.cellData).forEach(content => {
-        if (content && content.trim() !== '') {
-          summary[content] = (summary[content] || 0) + 1;
-        }
-      });
-
-      return Object.entries(summary)
-        .map(([field, count]) => ({
-          field,
-          count,
-          color: this.contentColorMap[field] || 'transparent'
-        }))
-        .sort((a, b) => b.count - a.count);
-    }
-  },
   methods: {
-    getCellContent(day, hour) {
-      const key = `${day}-${hour}`;
-      return this.cellData[key] || '';
-    },
-    isCellSelected(day, hour) {
-      return this.selectedCells.some(cell => cell.day === day && cell.hour === hour);
-    },
-    startSelection(day, hour, event) {
-      if (event.button !== 0) return;
-
-      this.isSelecting = true;
-      this.selectionStart = { day, hour };
-      this.selectionEnd = { day, hour };
-      this.updateSelectedCells();
-      event.preventDefault();
-    },
-    updateSelection(day, hour) {
-      if (!this.isSelecting) return;
-
-      this.selectionEnd = { day, hour };
-      this.updateSelectedCells();
-    },
-    endSelection() {
-      if (!this.isSelecting) return;
-
-      this.isSelecting = false;
-
-      if (this.selectedCells.length > 0) {
-        const content = prompt(`Enter content for ${this.selectedCells.length} selected cells:`);
-        if (content !== null) {
-          this.applyContentToSelection(content.trim());
-        }
-      }
-
-      this.selectedCells = [];
-      this.selectionStart = null;
-      this.selectionEnd = null;
-    },
-    updateSelectedCells() {
-      if (!this.selectionStart || !this.selectionEnd) {
-        this.selectedCells = [];
-        return;
-      }
-
-      const startDayIndex = this.days.indexOf(this.selectionStart.day);
-      const endDayIndex = this.days.indexOf(this.selectionEnd.day);
-      const minDayIndex = Math.min(startDayIndex, endDayIndex);
-      const maxDayIndex = Math.max(startDayIndex, endDayIndex);
-
-      const minHour = Math.min(this.selectionStart.hour, this.selectionEnd.hour);
-      const maxHour = Math.max(this.selectionStart.hour, this.selectionEnd.hour);
-
-      const selected = [];
-      for (let dayIndex = minDayIndex; dayIndex <= maxDayIndex; dayIndex++) {
-        for (let hour = minHour; hour <= maxHour; hour++) {
-          selected.push({
-            day: this.days[dayIndex],
-            hour
-          });
-        }
-      }
-
-      this.selectedCells = selected;
-    },
-    applyContentToSelection(content) {
-      this.selectedCells.forEach(({ day, hour }) => {
-        const key = `${day}-${hour}`;
-        const oldContent = this.cellData[key];
-
-        this.cellData[key] = content;
-
-        if (content !== '' && !this.contentColorMap[content]) {
-          this.contentColorMap[content] = this.getAvailableColor();
-        }
-
-        if (oldContent && oldContent !== content) {
-          const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
-          if (!stillUsed) {
-            delete this.contentColorMap[oldContent];
-          }
-        }
-      });
-
-      localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
-      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
-    },
-    getCellColor(day, hour) {
-      const content = this.cellData[`${day}-${hour}`];
-
-      if (content && content.trim() !== '') {
-        return this.contentColorMap[content] || 'transparent';
-      }
-      return 'transparent';
-    },
-    getAvailableColor() {
-      const usedColors = Object.values(this.contentColorMap);
-
-      const availableColor = this.colorPalette.find(color => !usedColors.includes(color));
-
-      return availableColor || this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
-    },
-    saveCellContent(event, day, hour) {
-      const key = `${day}-${hour}`;
-      const content = event.target.innerText.trim();
-      const oldContent = this.cellData[key];
-
-      this.cellData[key] = content;
-
-      if (content !== '') {
-        if (!this.contentColorMap[content]) {
-          this.contentColorMap[content] = this.getAvailableColor();
-        }
-      }
-
-      if (oldContent && oldContent !== content) {
-        const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
-        if (!stillUsed) {
-          delete this.contentColorMap[oldContent];
-        }
-      }
-
+    handleDataChange({ cellData, contentColorMap }) {
+      this.cellData = cellData;
+      this.contentColorMap = contentColorMap;
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
       localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
     },
     clearAll() {
       if (confirm('Are you sure you want to clear all content?')) {
-        this.cellData = {};
-        this.contentColorMap = {};
+        this.$refs.timeTable.clearData();
         localStorage.removeItem('weeklyTimeData');
         localStorage.removeItem('weeklyTimeColors');
       }
     },
     async exportToPng() {
       try {
-        const element = this.$refs.tableContainer.$el;
+        const element = this.$refs.timeTable.$el;
 
         const originalOverflow = element.style.overflow;
 
