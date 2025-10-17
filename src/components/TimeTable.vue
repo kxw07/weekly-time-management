@@ -277,37 +277,41 @@ export default {
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
-/* Mobile-friendly scrollbar - thick and always visible */
+/* Hide scrollbar but keep functionality */
 .table-container::-webkit-scrollbar {
-  height: 20px;
+  display: none;
 }
 
-.table-container::-webkit-scrollbar-track {
-  background: #f5f5f5;
-  border-top: 2px solid #ddd;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #424242;
-  border-radius: 10px;
-  border: 3px solid #f5f5f5;
-  min-width: 50px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #212121;
-}
-
-.table-container::-webkit-scrollbar-thumb:active {
-  background: #000;
-}
-
-/* For Firefox */
 .table-container {
-  scrollbar-width: thick;
-  scrollbar-color: #424242 #f5f5f5;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Add shadow indicators to show scrollable content */
+.table-container::before,
+.table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.table-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
+.table-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
 }
 
 .time-table {

@@ -148,3 +148,6 @@ restore last scroll bar's modification
 ## 25
 the table's horizontal scroll bar is still not good,
 imagine you are mobile user, how to improve for better UX, and use dark gray for it, not green.
+
+## 26
+scroll bar is still bad, think a new way to satisfy UX.
