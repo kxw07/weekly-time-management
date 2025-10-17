@@ -131,11 +131,12 @@ export default {
   border-radius: 2px;
   padding: 2px 4px;
   margin: -2px -4px;
-  transition: background-color 0.2s, color 0.3s;
+  transition: background-color 0.2s;
 }
 
+/* Keep dark text in dark mode because backgrounds are light colored */
 #app.dark-mode .summary-field {
-  color: #e0e0e0;
+  color: #333;
 }
 
 .summary-field:hover {
@@ -143,16 +144,16 @@ export default {
 }
 
 #app.dark-mode .summary-field:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .summary-time {
   color: #666;
   font-size: 13px;
-  transition: color 0.3s;
 }
 
+/* Keep darker text in dark mode for contrast with colored backgrounds */
 #app.dark-mode .summary-time {
-  color: #b0b0b0;
+  color: #555;
 }
 </style>

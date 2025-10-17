@@ -194,3 +194,6 @@ make an example, when background color is white, our text color normally is blac
 
 ## 36
 fix export png, it should not only export screen's view, but export all table's content.
+
+## 37
+fix "Time Summary"'s text color has no contrast problem when dark mode.
