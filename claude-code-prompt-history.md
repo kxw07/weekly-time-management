@@ -60,3 +60,9 @@ the opertaion step is
 
 ## 12
 move buttons to page bottom, and surround them with css like Time Summary.
+
+## 13
+time to refactor, but before refactoring, we need to add some unit test.
+now, you cannot edit App.vue,
+and add tests for all business logic, but not UIUX,
+make an example: same field content should have same background color, time summary should correct.
