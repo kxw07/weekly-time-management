@@ -47,20 +47,39 @@ vi.mock('html2canvas', () => ({
 }));
 ```
 
-### 4. App.spec.js - Export PNG Test
-**Problem:** Improper html2canvas mock usage in test
-**Fix:** Updated to use the mocked module correctly
+### 4. App.spec.js - Export Tests - createElement Mock Issue
+**Problem:** Mocking `document.createElement` breaks Vue's internal rendering (setAttribute errors)
+**Fix:** Only mock `createElement` for 'a' tags, let Vue use real DOM for other elements
 
 ```javascript
-it('should handle export-png event from Actions component', async () => {
-  const html2canvas = (await import('html2canvas')).default;
-
-  const mockCanvas = {
-    toBlob: vi.fn((callback) => callback(new Blob()))
+it('should handle export-json event from Actions component', async () => {
+  // Mock document.createElement only for 'a' elements
+  const mockLink = {
+    download: '',
+    href: '',
+    click: vi.fn(),
+    setAttribute: vi.fn()  // Required for Vue compatibility
   };
-  html2canvas.mockResolvedValue(mockCanvas);
+  const originalCreateElement = document.createElement.bind(document);
+  vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+    if (tag === 'a') {
+      return mockLink;
+    }
+    return originalCreateElement(tag);  // Let Vue use real elements
+  });
 
   // ... rest of test
+});
+```
+
+### 5. App.spec.js - Mock Cleanup
+**Problem:** Mocks from one test bleeding into other tests
+**Fix:** Added `afterEach` to restore all mocks
+
+```javascript
+afterEach(() => {
+  // Restore all mocks after each test
+  vi.restoreAllMocks();
 });
 ```
 

@@ -84,3 +84,38 @@ fix unit tests, and do not modify production code.
 ## 17
 still have some unit tests failed, fix them.
 and also remove REFACTORING md file.
+
+## 18
+failed test still exist, here are some information, fix them,
+
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Export Functionality > should handle export-json event from Actions component
+TypeError: el.setAttribute is not a function
+ ❯ setScopeId node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.js:58:8
+ ❯ setScopeId node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4925:7
+ ❯ mountElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4889:5
+ ❯ processElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4840:7
+ ❯ patch node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4706:11
+ ❯ mountChildren node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4952:7
+ ❯ mountElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4875:7
+ ❯ processElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4840:7
+ ❯ patch node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4706:11
+ ❯ ReactiveEffect.componentUpdateFn [as fn] node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:5417:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Export Functionality > should handle export-png event from Actions component
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Import Functionality > should handle import-json event from Actions component
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Import Functionality > should show alert for invalid JSON format
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Component Integration > should pass updated data to TimeSummary when TimeTable data changes
+ FAIL  src/tests/App.spec.js > App.vue - Integration Tests > Component Integration > should maintain data consistency between TimeTable and TimeSummary
+TypeError: el.setAttribute is not a function
+ ❯ setScopeId node_modules/@vue/runtime-dom/dist/runtime-dom.cjs.js:58:8
+ ❯ setScopeId node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4925:7
+ ❯ mountElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4889:5
+ ❯ processElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4840:7
+ ❯ patch node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4706:11
+ ❯ mountChildren node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4952:7
+ ❯ mountElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4875:7
+ ❯ processElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4840:7
+ ❯ patch node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4706:11
+ ❯ ReactiveEffect.componentUpdateFn [as fn] node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:5337:11

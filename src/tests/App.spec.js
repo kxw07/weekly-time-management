@@ -42,6 +42,11 @@ describe('App.vue - Integration Tests', () => {
     });
   });
 
+  afterEach(() => {
+    // Restore all mocks after each test
+    vi.restoreAllMocks();
+  });
+
   describe('Component Composition', () => {
     it('should render all child components', () => {
       expect(wrapper.findComponent(PageTitle).exists()).toBe(true);
@@ -167,13 +172,20 @@ describe('App.vue - Integration Tests', () => {
       global.URL.createObjectURL = vi.fn(() => 'mock-url');
       global.URL.revokeObjectURL = vi.fn();
 
-      // Mock document.createElement
+      // Mock document.createElement only for 'a' elements
       const mockLink = {
         download: '',
         href: '',
-        click: vi.fn()
+        click: vi.fn(),
+        setAttribute: vi.fn()
       };
-      vi.spyOn(document, 'createElement').mockReturnValue(mockLink);
+      const originalCreateElement = document.createElement.bind(document);
+      vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+        if (tag === 'a') {
+          return mockLink;
+        }
+        return originalCreateElement(tag);
+      });
 
       const actions = wrapper.findComponent(Actions);
       actions.vm.$emit('export-json');
@@ -198,13 +210,20 @@ describe('App.vue - Integration Tests', () => {
       global.URL.createObjectURL = vi.fn(() => 'mock-url');
       global.URL.revokeObjectURL = vi.fn();
 
-      // Mock document.createElement
+      // Mock document.createElement only for 'a' elements
       const mockLink = {
         download: '',
         href: '',
-        click: vi.fn()
+        click: vi.fn(),
+        setAttribute: vi.fn()
       };
-      vi.spyOn(document, 'createElement').mockReturnValue(mockLink);
+      const originalCreateElement = document.createElement.bind(document);
+      vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+        if (tag === 'a') {
+          return mockLink;
+        }
+        return originalCreateElement(tag);
+      });
 
       const actions = wrapper.findComponent(Actions);
       actions.vm.$emit('export-png');
