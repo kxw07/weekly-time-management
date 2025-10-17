@@ -279,28 +279,30 @@ export default {
   border-radius: 8px;
 }
 
-/* Thicker scrollbar for better mobile UX */
+/* Thicker and more obvious scrollbar for mobile UX */
 .table-container::-webkit-scrollbar {
-  height: 12px;
+  height: 14px;
 }
 
 .table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #e0e0e0;
+  border: 1px solid #d0d0d0;
 }
 
 .table-container::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 6px;
+  background: #4CAF50;
+  border-radius: 7px;
+  border: 2px solid #e0e0e0;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #45a049;
 }
 
 /* For Firefox */
 .table-container {
   scrollbar-width: auto;
-  scrollbar-color: #888 #f1f1f1;
+  scrollbar-color: #4CAF50 #e0e0e0;
 }
 
 .time-table {
@@ -326,10 +328,11 @@ export default {
   z-index: 10;
 }
 
-.hour-header {
+.time-table th.hour-header {
   background-color: #f9f9f9;
   min-width: 60px;
   color: #666;
+  font-weight: bold;
 }
 
 .hour-cell {

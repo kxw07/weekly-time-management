@@ -140,3 +140,7 @@ restore last scroll bar's modification
 ## 23
 1. change table's first column's first field background color to the same with first column's other row, it looks like gray, more accurate, the field's content is "Hour", I mean the field we need to change.
 2. make the table's horizontal scroll bar more thicker, it would be good for mobile user.
+
+## 24
+1. the field "Hour"'s background is not gray, fix it.
+2. and make table's horizontal scroll bar more obvious.
