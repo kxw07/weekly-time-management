@@ -1,6 +1,5 @@
 <template>
   <div class="table-wrapper">
-    <button class="scroll-btn scroll-left" @click="scrollLeft" aria-label="Scroll left">‹</button>
     <div class="table-container" ref="tableContainer">
       <table class="time-table">
       <thead>
@@ -33,7 +32,10 @@
     </table>
       <InputDialog ref="inputDialog" />
     </div>
-    <button class="scroll-btn scroll-right" @click="scrollRight" aria-label="Scroll right">›</button>
+    <div class="scroll-buttons">
+      <button class="scroll-btn scroll-left" @click="scrollLeft" aria-label="Scroll left">‹</button>
+      <button class="scroll-btn scroll-right" @click="scrollRight" aria-label="Scroll right">›</button>
+    </div>
   </div>
 </template>
 
@@ -291,43 +293,46 @@ export default {
 <style scoped>
 .table-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  position: relative;
+}
+
+.scroll-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }
 
 .scroll-btn {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 4px;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s;
   user-select: none;
   line-height: 1;
 }
 
 .scroll-btn:hover {
-  background-color: #45a049;
-  transform: scale(1.05);
+  background-color: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.5);
+  transform: translateY(-1px);
 }
 
 .scroll-btn:active {
-  background-color: #3d8b40;
-  transform: scale(0.95);
+  background-color: rgba(76, 175, 80, 0.35);
+  transform: translateY(0);
 }
 
 .table-container {
-  flex: 1;
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;

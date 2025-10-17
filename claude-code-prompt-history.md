@@ -155,3 +155,8 @@ scroll bar is still bad, think a new way to satisfy UX.
 ## 27
 the shadow's effect is not good, restore it.
 and I think we just add two buttons: "left" and "right" to help user move table view.
+
+## 28
+looks good,
+I want to move table view buttons below the table,
+and make its color more transparenter and fit table's color.
