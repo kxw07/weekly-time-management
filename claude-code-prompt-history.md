@@ -163,3 +163,7 @@ and make its color more transparenter and fit table's color.
 
 ## 29
 table view button should return to previous state after press.
+
+## 30
+button blur should work after pressing it immediately,
+and when user's screen can show all table content then do not show table view move button.

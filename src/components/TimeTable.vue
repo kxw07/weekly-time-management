@@ -32,9 +32,9 @@
     </table>
       <InputDialog ref="inputDialog" />
     </div>
-    <div class="scroll-buttons">
-      <button class="scroll-btn scroll-left" @click="scrollLeft" aria-label="Scroll left">‹</button>
-      <button class="scroll-btn scroll-right" @click="scrollRight" aria-label="Scroll right">›</button>
+    <div class="scroll-buttons" v-if="showScrollButtons">
+      <button class="scroll-btn scroll-left" @mousedown="scrollLeft" @touchstart="scrollLeft" aria-label="Scroll left">‹</button>
+      <button class="scroll-btn scroll-right" @mousedown="scrollRight" @touchstart="scrollRight" aria-label="Scroll right">›</button>
     </div>
   </div>
 </template>
@@ -74,6 +74,7 @@ export default {
       selectionStart: null,
       selectionEnd: null,
       selectedCells: [],
+      showScrollButtons: false,
       colorPalette: [
         '#B8D4E8',
         '#C8E6C9',
@@ -269,25 +270,36 @@ export default {
       this.emitDataChange();
     },
     scrollLeft(event) {
+      event.preventDefault();
+      event.target.blur();
       const container = this.$refs.tableContainer;
       if (container) {
         container.scrollBy({ left: -200, behavior: 'smooth' });
       }
-      event.target.blur();
     },
     scrollRight(event) {
+      event.preventDefault();
+      event.target.blur();
       const container = this.$refs.tableContainer;
       if (container) {
         container.scrollBy({ left: 200, behavior: 'smooth' });
       }
-      event.target.blur();
+    },
+    checkScrollable() {
+      const container = this.$refs.tableContainer;
+      if (container) {
+        this.showScrollButtons = container.scrollWidth > container.clientWidth;
+      }
     }
   },
   mounted() {
     window.addEventListener('mouseup', this.endSelection);
+    this.checkScrollable();
+    window.addEventListener('resize', this.checkScrollable);
   },
   beforeUnmount() {
     window.removeEventListener('mouseup', this.endSelection);
+    window.removeEventListener('resize', this.checkScrollable);
   }
 };
 </script>
