@@ -170,7 +170,7 @@ export default {
 
 #app {
   font-family: Arial, sans-serif;
-  padding: 20px;
+  padding: 8px;
   max-width: 100%;
   overflow-x: auto;
 }

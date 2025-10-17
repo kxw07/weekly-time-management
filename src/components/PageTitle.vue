@@ -12,12 +12,13 @@ export default {
 
 <style scoped>
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 h1 {
   color: #333;
   margin: 0;
+  font-size: 20px;
 }
 </style>

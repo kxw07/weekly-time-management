@@ -13,24 +13,34 @@
           <td
             v-for="day in days"
             :key="`${day}-${hour}`"
+            :data-cell-key="`${day}-${hour}`"
             class="time-cell"
             :class="{ 'selected': isCellSelected(day, hour) }"
             contenteditable="true"
             :style="{ backgroundColor: getCellColor(day, hour) }"
             @mousedown="startSelection(day, hour, $event)"
             @mouseenter="updateSelection(day, hour)"
+            @touchstart="handleTouchStart(day, hour, $event)"
+            @touchmove="handleTouchMove($event)"
+            @touchend="handleTouchEnd"
             @blur="saveCellContent($event, day, hour)"
             @keydown.enter.prevent="$event.target.blur()"
           >{{ getCellContent(day, hour) }}</td>
         </tr>
       </tbody>
     </table>
+    <InputDialog ref="inputDialog" />
   </div>
 </template>
 
 <script>
+import InputDialog from './InputDialog.vue';
+
 export default {
   name: 'TimeTable',
+  components: {
+    InputDialog
+  },
   props: {
     days: {
       type: Array,
@@ -124,14 +134,17 @@ export default {
       this.selectionEnd = { day, hour };
       this.updateSelectedCells();
     },
-    endSelection() {
+    async endSelection() {
       if (!this.isSelecting) return;
 
       this.isSelecting = false;
 
       if (this.selectedCells.length > 0) {
-        const content = prompt(`Enter content for ${this.selectedCells.length} selected cells:`);
-        if (content !== null) {
+        const content = await this.$refs.inputDialog.show(
+          `Enter content for ${this.selectedCells.length} selected cell${this.selectedCells.length > 1 ? 's' : ''}`,
+          'Enter activity name...'
+        );
+        if (content !== null && content.trim() !== '') {
           this.applyContentToSelection(content.trim());
         }
       }
@@ -139,6 +152,35 @@ export default {
       this.selectedCells = [];
       this.selectionStart = null;
       this.selectionEnd = null;
+    },
+    handleTouchStart(day, hour, event) {
+      // Prevent default to avoid scrolling while selecting
+      event.preventDefault();
+
+      this.isSelecting = true;
+      this.selectionStart = { day, hour };
+      this.selectionEnd = { day, hour };
+      this.updateSelectedCells();
+    },
+    handleTouchMove(event) {
+      if (!this.isSelecting) return;
+
+      event.preventDefault();
+
+      const touch = event.touches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+
+      if (element && element.classList.contains('time-cell')) {
+        const cellKey = element.getAttribute('data-cell-key');
+        if (cellKey) {
+          const [day, hourStr] = cellKey.split('-');
+          const hour = parseInt(hourStr, 10);
+          this.updateSelection(day, hour);
+        }
+      }
+    },
+    handleTouchEnd() {
+      this.endSelection();
     },
     updateSelectedCells() {
       if (!this.selectionStart || !this.selectionEnd) {
@@ -246,8 +288,9 @@ export default {
 .time-table th,
 .time-table td {
   border: 1px solid #ddd;
-  padding: 12px;
+  padding: 6px;
   text-align: center;
+  font-size: 14px;
 }
 
 .time-table th {
@@ -272,11 +315,11 @@ export default {
 }
 
 .time-cell {
-  min-width: 100px;
-  height: 40px;
+  min-width: 80px;
+  height: 32px;
   cursor: text;
   transition: background-color 0.2s;
-  padding: 8px;
+  padding: 4px;
   vertical-align: top;
   text-align: left;
   user-select: none;

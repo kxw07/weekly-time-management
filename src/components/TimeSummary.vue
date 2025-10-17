@@ -52,8 +52,8 @@ export default {
 
 <style scoped>
 .footer-summary {
-  margin-top: 30px;
-  padding: 20px;
+  margin-top: 12px;
+  padding: 12px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -61,24 +61,25 @@ export default {
 
 .footer-summary h2 {
   color: #333;
-  margin-bottom: 15px;
-  font-size: 20px;
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .summary-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 6px;
 }
 
 .summary-item {
-  padding: 10px 16px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-radius: 4px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   border: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
 }
 
 .summary-field {
@@ -88,6 +89,6 @@ export default {
 
 .summary-time {
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
 }
 </style>

@@ -119,3 +119,9 @@ TypeError: el.setAttribute is not a function
  ❯ processElement node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4840:7
  ❯ patch node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:4706:11
  ❯ ReactiveEffect.componentUpdateFn [as fn] node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:5337:11
+
+## 19
+we want to better user experience, here are some operation we should modify,
+1. use self component enter field content instead of native alert window.
+2. fix select and drag when using moblie phone.
+3. reduce margin size, we should do our better to show more content.

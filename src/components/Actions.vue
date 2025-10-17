@@ -43,8 +43,8 @@ export default {
 
 <style scoped>
 .actions-section {
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 12px;
+  padding: 12px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -52,24 +52,24 @@ export default {
 
 .actions-section h2 {
   color: #333;
-  margin-bottom: 15px;
-  font-size: 20px;
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .button-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .export-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: #2196F3;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   transition: background-color 0.2s;
 }
@@ -83,13 +83,13 @@ export default {
 }
 
 .export-json-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   transition: background-color 0.2s;
 }
@@ -103,13 +103,13 @@ export default {
 }
 
 .import-json-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: #FF9800;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   transition: background-color 0.2s;
 }
@@ -123,13 +123,13 @@ export default {
 }
 
 .clear-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: #f44336;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   transition: background-color 0.2s;
 }
