@@ -13,8 +13,9 @@
 - refresh page can load data from cache
 
 ## 5. deploy as a Github page
+- kxw07.github.io
 
-## 6. better RWD
+## 6. better RWD <- we are here
 - desktop, mobile
 - table
 - button
