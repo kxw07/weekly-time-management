@@ -50,3 +50,10 @@ which summarize different field content and sort by bigger time block,
 and shows like:
 Sleep: 5 hr
 Reading: 4 hr
+
+## 11
+I want to select a area and edit them one time,
+the opertaion step is
+1. click and hold to select a square area
+2. edit one field among them
+3. adjust content all selected area fields

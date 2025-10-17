@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @mouseup="endSelection">
     <div class="header">
       <h1>Weekly Time Management</h1>
       <div class="button-group">
@@ -31,8 +31,11 @@
               v-for="day in days"
               :key="`${day}-${hour}`"
               class="time-cell"
+              :class="{ 'selected': isCellSelected(day, hour) }"
               contenteditable="true"
               :style="{ backgroundColor: getCellColor(day, hour) }"
+              @mousedown="startSelection(day, hour, $event)"
+              @mouseenter="updateSelection(day, hour)"
               @blur="saveCellContent($event, day, hour)"
               @keydown.enter.prevent="$event.target.blur()"
             >{{ getCellContent(day, hour) }}</td>
@@ -68,6 +71,10 @@ export default {
       hours: Array.from({ length: 24 }, (_, i) => i),
       cellData: {},
       contentColorMap: {}, // Maps content text to color
+      isSelecting: false,
+      selectionStart: null,
+      selectionEnd: null,
+      selectedCells: [],
       colorPalette: [
         '#B8D4E8', // Soft blue
         '#C8E6C9', // Soft green
@@ -109,6 +116,94 @@ export default {
     getCellContent(day, hour) {
       const key = `${day}-${hour}`;
       return this.cellData[key] || '';
+    },
+    isCellSelected(day, hour) {
+      return this.selectedCells.some(cell => cell.day === day && cell.hour === hour);
+    },
+    startSelection(day, hour, event) {
+      // Only start selection with left mouse button
+      if (event.button !== 0) return;
+
+      this.isSelecting = true;
+      this.selectionStart = { day, hour };
+      this.selectionEnd = { day, hour };
+      this.updateSelectedCells();
+      event.preventDefault();
+    },
+    updateSelection(day, hour) {
+      if (!this.isSelecting) return;
+
+      this.selectionEnd = { day, hour };
+      this.updateSelectedCells();
+    },
+    endSelection() {
+      if (!this.isSelecting) return;
+
+      this.isSelecting = false;
+
+      // If we have selected cells, prompt for content
+      if (this.selectedCells.length > 0) {
+        const content = prompt(`Enter content for ${this.selectedCells.length} selected cells:`);
+        if (content !== null) {
+          this.applyContentToSelection(content.trim());
+        }
+      }
+
+      // Clear selection
+      this.selectedCells = [];
+      this.selectionStart = null;
+      this.selectionEnd = null;
+    },
+    updateSelectedCells() {
+      if (!this.selectionStart || !this.selectionEnd) {
+        this.selectedCells = [];
+        return;
+      }
+
+      const startDayIndex = this.days.indexOf(this.selectionStart.day);
+      const endDayIndex = this.days.indexOf(this.selectionEnd.day);
+      const minDayIndex = Math.min(startDayIndex, endDayIndex);
+      const maxDayIndex = Math.max(startDayIndex, endDayIndex);
+
+      const minHour = Math.min(this.selectionStart.hour, this.selectionEnd.hour);
+      const maxHour = Math.max(this.selectionStart.hour, this.selectionEnd.hour);
+
+      const selected = [];
+      for (let dayIndex = minDayIndex; dayIndex <= maxDayIndex; dayIndex++) {
+        for (let hour = minHour; hour <= maxHour; hour++) {
+          selected.push({
+            day: this.days[dayIndex],
+            hour
+          });
+        }
+      }
+
+      this.selectedCells = selected;
+    },
+    applyContentToSelection(content) {
+      this.selectedCells.forEach(({ day, hour }) => {
+        const key = `${day}-${hour}`;
+        const oldContent = this.cellData[key];
+
+        this.cellData[key] = content;
+
+        // Assign color for new content
+        if (content !== '' && !this.contentColorMap[content]) {
+          this.contentColorMap[content] = this.getAvailableColor();
+        }
+
+        // Clean up old content color if no longer used
+        if (oldContent && oldContent !== content) {
+          const stillUsed = Object.values(this.cellData).some(val => val === oldContent);
+          if (!stillUsed) {
+            delete this.contentColorMap[oldContent];
+          }
+        }
+      });
+
+      // Save to localStorage
+      localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
     },
     getCellColor(day, hour) {
       const content = this.cellData[`${day}-${hour}`];
@@ -437,6 +532,7 @@ h1 {
   padding: 8px;
   vertical-align: top;
   text-align: left;
+  user-select: none;
 }
 
 .time-cell:hover {
@@ -446,6 +542,13 @@ h1 {
 .time-cell:focus {
   outline: 2px solid #4CAF50;
   background-color: #fff;
+}
+
+.time-cell.selected {
+  outline: 2px solid #2196F3;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.3);
+  z-index: 1;
 }
 
 .footer-summary {
