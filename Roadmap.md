@@ -12,10 +12,9 @@
 ## 4. cache in broswer storage
 - refresh page can load data from cache
 
-## 5. better RWD
+## 5. deploy as a Github page
+
+## 6. better RWD
 - desktop, mobile
 - table
 - button
-
-## 6. deploy to firebase
-- public access
