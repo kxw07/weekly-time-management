@@ -1,5 +1,5 @@
 <template>
-  <div class="table-wrapper">
+  <div class="table-wrapper" :class="{ 'dark-mode': isDarkMode }">
     <div class="table-container" ref="tableContainer">
       <table class="time-table">
       <thead>
@@ -16,11 +16,11 @@
             :key="`${day}-${hour}`"
             :data-cell-key="`${day}-${hour}`"
             class="time-cell"
-            :class="{ 'selected': isCellSelected(day, hour) }"
-            contenteditable="true"
+            :class="{ 'selected': isCellSelected(day, hour), 'locked': isLocked }"
+            :contenteditable="!isLocked"
             :style="{ backgroundColor: getCellColor(day, hour) }"
-            @mousedown="startSelection(day, hour, $event)"
-            @mouseenter="updateSelection(day, hour)"
+            @mousedown="handleMouseDown(day, hour, $event)"
+            @mouseenter="handleMouseEnter(day, hour)"
             @touchstart="handleTouchStart(day, hour, $event)"
             @touchmove="handleTouchMove($event)"
             @touchend="handleTouchEnd"
@@ -32,9 +32,28 @@
     </table>
       <InputDialog ref="inputDialog" />
     </div>
-    <div class="scroll-buttons" v-if="showScrollButtons">
-      <button class="scroll-btn scroll-left" @mousedown="scrollLeft" @touchstart="scrollLeft" aria-label="Scroll left">‹</button>
-      <button class="scroll-btn scroll-right" @mousedown="scrollRight" @touchstart="scrollRight" aria-label="Scroll right">›</button>
+    <div class="control-buttons">
+      <div class="scroll-buttons" v-if="showScrollButtons">
+        <button class="scroll-btn scroll-left" @mousedown="scrollLeft" @touchstart="scrollLeft" aria-label="Scroll left">‹</button>
+        <button class="scroll-btn scroll-right" @mousedown="scrollRight" @touchstart="scrollRight" aria-label="Scroll right">›</button>
+      </div>
+      <div class="mode-buttons">
+        <button
+          v-if="showScrollButtons"
+          class="mode-btn"
+          @click="toggleLockMode"
+          :aria-label="isLocked ? 'Unlock editing' : 'Lock editing'"
+        >
+          {{ isLocked ? '🔒' : '🔓' }}
+        </button>
+        <button
+          class="mode-btn"
+          @click="toggleDarkMode"
+          aria-label="Toggle dark mode"
+        >
+          {{ isDarkMode ? '☀️' : '🌙' }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -75,6 +94,9 @@ export default {
       selectionEnd: null,
       selectedCells: [],
       showScrollButtons: false,
+      isLocked: false,
+      isDarkMode: false,
+      dragScrollStart: null,
       colorPalette: [
         '#B8D4E8',
         '#C8E6C9',
@@ -126,9 +148,20 @@ export default {
       const availableColor = this.colorPalette.find(color => !usedColors.includes(color));
       return availableColor || this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     },
-    startSelection(day, hour, event) {
+    handleMouseDown(day, hour, event) {
       if (event.button !== 0) return;
 
+      if (this.isLocked) {
+        this.startDragScroll(event);
+      } else {
+        this.startSelection(day, hour, event);
+      }
+    },
+    handleMouseEnter(day, hour) {
+      if (this.isLocked) return;
+      this.updateSelection(day, hour);
+    },
+    startSelection(day, hour, event) {
       this.isSelecting = true;
       this.selectionStart = { day, hour };
       this.selectionEnd = { day, hour };
@@ -141,8 +174,33 @@ export default {
       this.selectionEnd = { day, hour };
       this.updateSelectedCells();
     },
+    startDragScroll(event) {
+      const container = this.$refs.tableContainer;
+      if (!container) return;
+
+      this.dragScrollStart = {
+        scrollLeft: container.scrollLeft,
+        clientX: event.clientX
+      };
+
+      const handleMouseMove = (e) => {
+        if (!this.dragScrollStart) return;
+        const dx = e.clientX - this.dragScrollStart.clientX;
+        container.scrollLeft = this.dragScrollStart.scrollLeft - dx;
+      };
+
+      const handleMouseUp = () => {
+        this.dragScrollStart = null;
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      event.preventDefault();
+    },
     async endSelection() {
-      if (!this.isSelecting) return;
+      if (!this.isSelecting || this.isLocked) return;
 
       this.isSelecting = false;
 
@@ -161,7 +219,10 @@ export default {
       this.selectionEnd = null;
     },
     handleTouchStart(day, hour, event) {
-      // Prevent default to avoid scrolling while selecting
+      if (this.isLocked) {
+        return;
+      }
+
       event.preventDefault();
 
       this.isSelecting = true;
@@ -274,7 +335,8 @@ export default {
       event.target.blur();
       const container = this.$refs.tableContainer;
       if (container) {
-        container.scrollBy({ left: -200, behavior: 'smooth' });
+        const newScrollLeft = Math.max(0, container.scrollLeft - 200);
+        container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
       }
     },
     scrollRight(event) {
@@ -282,7 +344,9 @@ export default {
       event.target.blur();
       const container = this.$refs.tableContainer;
       if (container) {
-        container.scrollBy({ left: 200, behavior: 'smooth' });
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        const newScrollLeft = Math.min(maxScroll, container.scrollLeft + 200);
+        container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
       }
     },
     checkScrollable() {
@@ -290,6 +354,17 @@ export default {
       if (container) {
         this.showScrollButtons = container.scrollWidth > container.clientWidth;
       }
+    },
+    toggleLockMode() {
+      this.isLocked = !this.isLocked;
+      if (this.isLocked) {
+        this.selectedCells = [];
+        this.selectionStart = null;
+        this.selectionEnd = null;
+      }
+    },
+    toggleDarkMode() {
+      this.isDarkMode = !this.isDarkMode;
     }
   },
   mounted() {
@@ -309,12 +384,25 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .scroll-buttons {
   display: flex;
   justify-content: center;
   gap: 12px;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .scroll-btn {
@@ -342,6 +430,33 @@ export default {
 }
 
 .scroll-btn:active {
+  background-color: rgba(76, 175, 80, 0.35);
+  transform: translateY(0);
+}
+
+.mode-btn {
+  width: 44px;
+  height: 44px;
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.mode-btn:hover {
+  background-color: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.5);
+  transform: translateY(-1px);
+}
+
+.mode-btn:active {
   background-color: rgba(76, 175, 80, 0.35);
   transform: translateY(0);
 }
@@ -426,5 +541,51 @@ export default {
   outline-offset: -2px;
   box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.3);
   z-index: 1;
+}
+
+.time-cell.locked {
+  cursor: grab;
+}
+
+.time-cell.locked:active {
+  cursor: grabbing;
+}
+
+/* Dark mode styles */
+.table-wrapper.dark-mode .table-container {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.table-wrapper.dark-mode .time-table {
+  background: #2b2b2b;
+}
+
+.table-wrapper.dark-mode .time-table th {
+  background-color: #1a5f1f;
+  color: #e0e0e0;
+}
+
+.table-wrapper.dark-mode .time-table th.hour-header {
+  background-color: #424242;
+  color: #b0b0b0;
+}
+
+.table-wrapper.dark-mode .hour-cell {
+  background-color: #424242;
+  color: #b0b0b0;
+}
+
+.table-wrapper.dark-mode .time-table td {
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.table-wrapper.dark-mode .time-cell:hover {
+  background-color: #3a3a3a;
+}
+
+.table-wrapper.dark-mode .time-cell:focus {
+  outline: 2px solid #4CAF50;
+  background-color: #2b2b2b;
 }
 </style>

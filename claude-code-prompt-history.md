@@ -167,3 +167,12 @@ table view button should return to previous state after press.
 ## 30
 button blur should work after pressing it immediately,
 and when user's screen can show all table content then do not show table view move button.
+
+## 31
+1. add lock/unlock mode switch button
+the switch button only appears when user's screen cannot show full table content.
+when state is lock then table cannot be edit, and drag can move table view without trigger input dislog.
+when state is unlock then table can be edit, and drag's function same with it used to be.
+
+2. add dark/light mode switch button
+3. fix table view button bug, it cannot exceed table boundary.
