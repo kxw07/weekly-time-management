@@ -57,3 +57,6 @@ the opertaion step is
 1. click and hold to select a square area
 2. edit one field among them
 3. adjust content all selected area fields
+
+## 12
+move buttons to page bottom, and surround them with css like Time Summary.

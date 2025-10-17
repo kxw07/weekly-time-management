@@ -2,19 +2,6 @@
   <div id="app" @mouseup="endSelection">
     <div class="header">
       <h1>Weekly Time Management</h1>
-      <div class="button-group">
-        <button class="export-btn" @click="exportToPng">Export PNG</button>
-        <button class="export-json-btn" @click="exportToJson">Export JSON</button>
-        <button class="import-json-btn" @click="triggerImportJson">Import JSON</button>
-        <input
-          type="file"
-          ref="fileInput"
-          @change="importFromJson"
-          accept=".json"
-          style="display: none;"
-        />
-        <button class="clear-btn" @click="clearAll">Clear All</button>
-      </div>
     </div>
     <div class="table-container" ref="tableContainer">
       <table class="time-table">
@@ -55,6 +42,22 @@
           <span class="summary-field">{{ item.field }}</span>
           <span class="summary-time">{{ item.count }} hr</span>
         </div>
+      </div>
+    </div>
+    <div class="actions-section">
+      <h2>Actions</h2>
+      <div class="button-group">
+        <button class="export-btn" @click="exportToPng">Export PNG</button>
+        <button class="export-json-btn" @click="exportToJson">Export JSON</button>
+        <button class="import-json-btn" @click="triggerImportJson">Import JSON</button>
+        <input
+          type="file"
+          ref="fileInput"
+          @change="importFromJson"
+          accept=".json"
+          style="display: none;"
+        />
+        <button class="clear-btn" @click="clearAll">Clear All</button>
       </div>
     </div>
   </div>
@@ -386,22 +389,13 @@ export default {
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 h1 {
   color: #333;
   margin: 0;
-  flex-grow: 1;
-  text-align: center;
-}
-
-.button-group {
-  display: flex;
-  gap: 10px;
 }
 
 .export-btn {
@@ -589,5 +583,25 @@ h1 {
 .summary-time {
   color: #666;
   font-size: 14px;
+}
+
+.actions-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.actions-section h2 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 </style>
