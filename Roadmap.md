@@ -2,11 +2,11 @@
 ## 1. simple table
 - editable, color background
 
-## 2. export, import <- we are here
+## 2. export, import
 - export: png, json
 - import: json
 
-## 3. content time summary
+## 3. content time summary <- we are here
 - summarize by different content
 
 ## 4. cache in broswer storage
