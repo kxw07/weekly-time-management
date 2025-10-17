@@ -191,3 +191,6 @@ let user can edit "Time Summary"'s field name, and it would adjust back to table
 ## 35
 the text color should have contrast from background color,
 make an example, when background color is white, our text color normally is black.
+
+## 36
+fix export png, it should not only export screen's view, but export all table's content.

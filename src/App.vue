@@ -91,24 +91,30 @@ export default {
     },
     async exportToPng() {
       try {
-        const element = this.$refs.timeTable.$el;
+        const tableContainer = this.$refs.timeTable.$refs.tableContainer;
+        const table = tableContainer.querySelector('.time-table');
 
-        const originalOverflow = element.style.overflow;
+        const originalContainerOverflow = tableContainer.style.overflow;
+        const originalContainerWidth = tableContainer.style.width;
+        const originalContainerHeight = tableContainer.style.height;
 
-        element.style.overflow = 'visible';
+        tableContainer.style.overflow = 'visible';
+        tableContainer.style.width = 'auto';
+        tableContainer.style.height = 'auto';
 
-        const canvas = await html2canvas(element, {
-          backgroundColor: '#ffffff',
+        const canvas = await html2canvas(table, {
+          backgroundColor: this.isDarkMode ? '#2b2b2b' : '#ffffff',
           scale: 2,
           scrollX: 0,
-          scrollY: 0,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight,
-          width: element.scrollWidth,
-          height: element.scrollHeight
+          scrollY: -window.scrollY,
+          windowWidth: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight,
+          useCORS: true
         });
 
-        element.style.overflow = originalOverflow;
+        tableContainer.style.overflow = originalContainerOverflow;
+        tableContainer.style.width = originalContainerWidth;
+        tableContainer.style.height = originalContainerHeight;
 
         canvas.toBlob((blob) => {
           const url = URL.createObjectURL(blob);
