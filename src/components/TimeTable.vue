@@ -542,15 +542,18 @@ export default {
   vertical-align: top;
   text-align: left;
   user-select: none;
+  color: #333;
 }
 
 .time-cell:hover {
   background-color: #f0f0f0;
+  color: #333;
 }
 
 .time-cell:focus {
   outline: 2px solid #4CAF50;
   background-color: #fff;
+  color: #333;
 }
 
 .time-cell.selected {
@@ -594,20 +597,30 @@ export default {
 
 .table-wrapper.dark-mode .time-table td {
   border-color: #555;
+}
+
+/* Empty cells should have light text in dark mode */
+.table-wrapper.dark-mode .time-cell:empty {
   color: #e0e0e0;
 }
 
-.table-wrapper.dark-mode .time-cell {
-  color: #e0e0e0;
+/* Cells with colored backgrounds keep dark text for contrast */
+.table-wrapper.dark-mode .time-cell[style*="background"] {
+  color: #333;
 }
 
-.table-wrapper.dark-mode .time-cell:hover {
+/* Hover state for empty cells in dark mode */
+.table-wrapper.dark-mode .time-cell:empty:hover {
   background-color: #3a3a3a;
   color: #e0e0e0;
 }
 
+/* Focus state in dark mode */
 .table-wrapper.dark-mode .time-cell:focus {
   outline: 2px solid #4CAF50;
+}
+
+.table-wrapper.dark-mode .time-cell:empty:focus {
   background-color: #2b2b2b;
   color: #e0e0e0;
 }

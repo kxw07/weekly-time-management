@@ -187,3 +187,7 @@ let user can edit "Time Summary"'s field name, and it would adjust back to table
 ## 34
 1. reset table's four corners css effect, treat them just like other table boundary.
 2. fix the font's color when enable dark mode.
+
+## 35
+the text color should have contrast from background color,
+make an example, when background color is white, our text color normally is black.
