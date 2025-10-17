@@ -241,14 +241,13 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
 
       const vm = wrapper.vm;
 
-      // Mock the InputDialog
-      vm.$refs.inputDialog = {
-        show: vi.fn().mockResolvedValue('Sleeping')
-      };
+      // Mock the InputDialog show method
+      const mockShow = vi.fn().mockResolvedValue('Sleeping');
+      vi.spyOn(vm.$refs.inputDialog, 'show').mockImplementation(mockShow);
 
       await vm.handleFieldClick('Sleep');
 
-      expect(vm.$refs.inputDialog.show).toHaveBeenCalledWith('Rename Field', 'Sleep');
+      expect(mockShow).toHaveBeenCalledWith('Rename Field', 'Sleep');
       expect(wrapper.emitted('rename-field')).toBeTruthy();
       expect(wrapper.emitted('rename-field')[0][0]).toEqual({
         oldField: 'Sleep',
@@ -257,11 +256,19 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
     });
 
     it('should not emit rename-field event when new name is empty', async () => {
+      await wrapper.setProps({
+        cellData: {
+          'Monday-9': 'Sleep'
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8'
+        }
+      });
+
       const vm = wrapper.vm;
 
-      vm.$refs.inputDialog = {
-        show: vi.fn().mockResolvedValue('')
-      };
+      const mockShow = vi.fn().mockResolvedValue('');
+      vi.spyOn(vm.$refs.inputDialog, 'show').mockImplementation(mockShow);
 
       await vm.handleFieldClick('Sleep');
 
@@ -269,11 +276,19 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
     });
 
     it('should not emit rename-field event when new name is the same', async () => {
+      await wrapper.setProps({
+        cellData: {
+          'Monday-9': 'Sleep'
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8'
+        }
+      });
+
       const vm = wrapper.vm;
 
-      vm.$refs.inputDialog = {
-        show: vi.fn().mockResolvedValue('Sleep')
-      };
+      const mockShow = vi.fn().mockResolvedValue('Sleep');
+      vi.spyOn(vm.$refs.inputDialog, 'show').mockImplementation(mockShow);
 
       await vm.handleFieldClick('Sleep');
 
@@ -281,11 +296,19 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
     });
 
     it('should not emit rename-field event when user cancels', async () => {
+      await wrapper.setProps({
+        cellData: {
+          'Monday-9': 'Sleep'
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8'
+        }
+      });
+
       const vm = wrapper.vm;
 
-      vm.$refs.inputDialog = {
-        show: vi.fn().mockResolvedValue(null)
-      };
+      const mockShow = vi.fn().mockResolvedValue(null);
+      vi.spyOn(vm.$refs.inputDialog, 'show').mockImplementation(mockShow);
 
       await vm.handleFieldClick('Sleep');
 
@@ -293,11 +316,19 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
     });
 
     it('should trim whitespace from new field name', async () => {
+      await wrapper.setProps({
+        cellData: {
+          'Monday-9': 'Sleep'
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8'
+        }
+      });
+
       const vm = wrapper.vm;
 
-      vm.$refs.inputDialog = {
-        show: vi.fn().mockResolvedValue('  Sleeping  ')
-      };
+      const mockShow = vi.fn().mockResolvedValue('  Sleeping  ');
+      vi.spyOn(vm.$refs.inputDialog, 'show').mockImplementation(mockShow);
 
       await vm.handleFieldClick('Sleep');
 

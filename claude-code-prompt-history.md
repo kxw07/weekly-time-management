@@ -200,3 +200,7 @@ fix "Time Summary"'s text color has no contrast problem when dark mode.
 
 ## 38
 add unit test for business logic.
+
+## 39
+still have some unit tests failed, fix them,
+and we should use npm run test to run unit test.

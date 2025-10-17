@@ -398,16 +398,11 @@ describe('TimeTable.vue - Business Logic Tests', () => {
     it('should show scroll buttons when content exceeds container width', () => {
       const vm = wrapper.vm;
 
-      // Mock container with scrollable content
-      const mockContainer = {
-        scrollWidth: 1000,
-        clientWidth: 500,
-        scrollLeft: 0,
-        scrollBy: vi.fn(),
-        scrollTo: vi.fn()
-      };
+      // Get the actual ref and mock its properties
+      const container = wrapper.vm.$refs.tableContainer;
+      Object.defineProperty(container, 'scrollWidth', { value: 1000, writable: true });
+      Object.defineProperty(container, 'clientWidth', { value: 500, writable: true });
 
-      vm.$refs.tableContainer = mockContainer;
       vm.checkScrollable();
 
       expect(vm.showScrollButtons).toBe(true);
@@ -416,13 +411,10 @@ describe('TimeTable.vue - Business Logic Tests', () => {
     it('should hide scroll buttons when content fits in container', () => {
       const vm = wrapper.vm;
 
-      const mockContainer = {
-        scrollWidth: 500,
-        clientWidth: 500,
-        scrollLeft: 0
-      };
+      const container = wrapper.vm.$refs.tableContainer;
+      Object.defineProperty(container, 'scrollWidth', { value: 500, writable: true });
+      Object.defineProperty(container, 'clientWidth', { value: 500, writable: true });
 
-      vm.$refs.tableContainer = mockContainer;
       vm.checkScrollable();
 
       expect(vm.showScrollButtons).toBe(false);
@@ -430,13 +422,10 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
     it('should scroll left when scrollLeft is called', () => {
       const vm = wrapper.vm;
+      const container = wrapper.vm.$refs.tableContainer;
 
-      const mockContainer = {
-        scrollLeft: 300,
-        scrollTo: vi.fn()
-      };
-
-      vm.$refs.tableContainer = mockContainer;
+      Object.defineProperty(container, 'scrollLeft', { value: 300, writable: true });
+      const scrollToSpy = vi.spyOn(container, 'scrollTo').mockImplementation(() => {});
 
       const event = {
         preventDefault: vi.fn(),
@@ -447,7 +436,7 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
       expect(event.preventDefault).toHaveBeenCalled();
       expect(event.target.blur).toHaveBeenCalled();
-      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+      expect(scrollToSpy).toHaveBeenCalledWith({
         left: 100,
         behavior: 'smooth'
       });
@@ -455,15 +444,12 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
     it('should scroll right when scrollRight is called', () => {
       const vm = wrapper.vm;
+      const container = wrapper.vm.$refs.tableContainer;
 
-      const mockContainer = {
-        scrollLeft: 100,
-        scrollWidth: 1000,
-        clientWidth: 500,
-        scrollTo: vi.fn()
-      };
-
-      vm.$refs.tableContainer = mockContainer;
+      Object.defineProperty(container, 'scrollLeft', { value: 100, writable: true });
+      Object.defineProperty(container, 'scrollWidth', { value: 1000, writable: true });
+      Object.defineProperty(container, 'clientWidth', { value: 500, writable: true });
+      const scrollToSpy = vi.spyOn(container, 'scrollTo').mockImplementation(() => {});
 
       const event = {
         preventDefault: vi.fn(),
@@ -474,7 +460,7 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
       expect(event.preventDefault).toHaveBeenCalled();
       expect(event.target.blur).toHaveBeenCalled();
-      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+      expect(scrollToSpy).toHaveBeenCalledWith({
         left: 300,
         behavior: 'smooth'
       });
@@ -482,13 +468,10 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
     it('should not scroll left beyond 0', () => {
       const vm = wrapper.vm;
+      const container = wrapper.vm.$refs.tableContainer;
 
-      const mockContainer = {
-        scrollLeft: 50,
-        scrollTo: vi.fn()
-      };
-
-      vm.$refs.tableContainer = mockContainer;
+      Object.defineProperty(container, 'scrollLeft', { value: 50, writable: true });
+      const scrollToSpy = vi.spyOn(container, 'scrollTo').mockImplementation(() => {});
 
       const event = {
         preventDefault: vi.fn(),
@@ -497,7 +480,7 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
       vm.scrollLeft(event);
 
-      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+      expect(scrollToSpy).toHaveBeenCalledWith({
         left: 0,
         behavior: 'smooth'
       });
@@ -505,15 +488,12 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
     it('should not scroll right beyond max scroll', () => {
       const vm = wrapper.vm;
+      const container = wrapper.vm.$refs.tableContainer;
 
-      const mockContainer = {
-        scrollLeft: 450,
-        scrollWidth: 1000,
-        clientWidth: 500,
-        scrollTo: vi.fn()
-      };
-
-      vm.$refs.tableContainer = mockContainer;
+      Object.defineProperty(container, 'scrollLeft', { value: 450, writable: true });
+      Object.defineProperty(container, 'scrollWidth', { value: 1000, writable: true });
+      Object.defineProperty(container, 'clientWidth', { value: 500, writable: true });
+      const scrollToSpy = vi.spyOn(container, 'scrollTo').mockImplementation(() => {});
 
       const event = {
         preventDefault: vi.fn(),
@@ -522,7 +502,7 @@ describe('TimeTable.vue - Business Logic Tests', () => {
 
       vm.scrollRight(event);
 
-      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+      expect(scrollToSpy).toHaveBeenCalledWith({
         left: 500,
         behavior: 'smooth'
       });
