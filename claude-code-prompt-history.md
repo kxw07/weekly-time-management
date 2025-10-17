@@ -176,3 +176,6 @@ when state is unlock then table can be edit, and drag's function same with it us
 
 2. add dark/light mode switch button
 3. fix table view button bug, it cannot exceed table boundary.
+
+## 32
+let user can edit "Time Summary"'s field name, and it would adjust back to table content and would not change background color.

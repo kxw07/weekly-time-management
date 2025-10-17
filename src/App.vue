@@ -12,6 +12,7 @@
     <TimeSummary
       :cell-data="cellData"
       :content-color-map="contentColorMap"
+      @rename-field="handleFieldRename"
     />
     <Actions
       @export-png="exportToPng"
@@ -49,6 +50,28 @@ export default {
     handleDataChange({ cellData, contentColorMap }) {
       this.cellData = cellData;
       this.contentColorMap = contentColorMap;
+      localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+      localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
+    },
+    handleFieldRename({ oldField, newField }) {
+      const newCellData = {};
+      const newContentColorMap = { ...this.contentColorMap };
+
+      Object.keys(this.cellData).forEach(key => {
+        if (this.cellData[key] === oldField) {
+          newCellData[key] = newField;
+        } else {
+          newCellData[key] = this.cellData[key];
+        }
+      });
+
+      if (newContentColorMap[oldField]) {
+        newContentColorMap[newField] = newContentColorMap[oldField];
+        delete newContentColorMap[oldField];
+      }
+
+      this.cellData = newCellData;
+      this.contentColorMap = newContentColorMap;
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
       localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
     },

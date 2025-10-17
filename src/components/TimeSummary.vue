@@ -8,7 +8,12 @@
         class="summary-item"
         :style="{ backgroundColor: item.color }"
       >
-        <span class="summary-field">{{ item.field }}</span>
+        <span
+          class="summary-field"
+          contenteditable="true"
+          @blur="handleFieldRename($event, item.field)"
+          @keydown.enter.prevent="$event.target.blur()"
+        >{{ item.field }}</span>
         <span class="summary-time">{{ item.count }} hr</span>
       </div>
     </div>
@@ -28,6 +33,7 @@ export default {
       required: true
     }
   },
+  emits: ['rename-field'],
   computed: {
     timeSummary() {
       const summary = {};
@@ -45,6 +51,18 @@ export default {
           color: this.contentColorMap[field] || 'transparent'
         }))
         .sort((a, b) => b.count - a.count);
+    }
+  },
+  methods: {
+    handleFieldRename(event, oldField) {
+      const newField = event.target.innerText.trim();
+
+      if (newField === '' || newField === oldField) {
+        event.target.innerText = oldField;
+        return;
+      }
+
+      this.$emit('rename-field', { oldField, newField });
     }
   }
 };
@@ -85,6 +103,20 @@ export default {
 .summary-field {
   font-weight: bold;
   color: #333;
+  cursor: text;
+  outline: none;
+  border-radius: 2px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.summary-field:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.summary-field:focus {
+  background-color: rgba(76, 175, 80, 0.1);
+  outline: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .summary-time {
