@@ -340,4 +340,135 @@ describe('App.vue - Integration Tests', () => {
       expect(timeSummary.props('contentColorMap')).toEqual(timeTable.vm.contentColorMap);
     });
   });
+
+  describe('Field Renaming', () => {
+    it('should handle field rename from TimeSummary', () => {
+      const vm = wrapper.vm;
+
+      vm.cellData = {
+        'Monday-9': 'Sleep',
+        'Tuesday-9': 'Sleep',
+        'Wednesday-9': 'Work'
+      };
+      vm.contentColorMap = {
+        'Sleep': '#B8D4E8',
+        'Work': '#C8E6C9'
+      };
+
+      vm.handleFieldRename({ oldField: 'Sleep', newField: 'Sleeping' });
+
+      expect(vm.cellData['Monday-9']).toBe('Sleeping');
+      expect(vm.cellData['Tuesday-9']).toBe('Sleeping');
+      expect(vm.cellData['Wednesday-9']).toBe('Work');
+
+      expect(vm.contentColorMap['Sleeping']).toBe('#B8D4E8');
+      expect(vm.contentColorMap['Sleep']).toBeUndefined();
+      expect(vm.contentColorMap['Work']).toBe('#C8E6C9');
+    });
+
+    it('should persist renamed field to localStorage', () => {
+      const vm = wrapper.vm;
+
+      vm.cellData = {
+        'Monday-9': 'Sleep'
+      };
+      vm.contentColorMap = {
+        'Sleep': '#B8D4E8'
+      };
+
+      vm.handleFieldRename({ oldField: 'Sleep', newField: 'Sleeping' });
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'weeklyTimeData',
+        expect.stringContaining('Sleeping')
+      );
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'weeklyTimeColors',
+        expect.stringContaining('Sleeping')
+      );
+    });
+
+    it('should only rename cells with matching content', () => {
+      const vm = wrapper.vm;
+
+      vm.cellData = {
+        'Monday-9': 'Sleep',
+        'Monday-10': 'Work',
+        'Tuesday-9': 'Sleep'
+      };
+
+      vm.handleFieldRename({ oldField: 'Sleep', newField: 'Resting' });
+
+      expect(vm.cellData['Monday-9']).toBe('Resting');
+      expect(vm.cellData['Monday-10']).toBe('Work');
+      expect(vm.cellData['Tuesday-9']).toBe('Resting');
+    });
+  });
+
+  describe('Dark Mode', () => {
+    it('should toggle dark mode', () => {
+      const vm = wrapper.vm;
+
+      expect(vm.isDarkMode).toBe(false);
+
+      vm.toggleDarkMode();
+      expect(vm.isDarkMode).toBe(true);
+
+      vm.toggleDarkMode();
+      expect(vm.isDarkMode).toBe(false);
+    });
+
+    it('should persist dark mode preference to localStorage', () => {
+      const vm = wrapper.vm;
+
+      vm.toggleDarkMode();
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'darkMode',
+        JSON.stringify(true)
+      );
+    });
+
+    it('should load dark mode preference from localStorage on mount', () => {
+      localStorageMock.getItem = vi.fn((key) => {
+        if (key === 'darkMode') return JSON.stringify(true);
+        return null;
+      });
+
+      const newWrapper = mount(App);
+
+      expect(newWrapper.vm.isDarkMode).toBe(true);
+    });
+
+    it('should apply dark-mode class to app when isDarkMode is true', async () => {
+      const vm = wrapper.vm;
+
+      vm.isDarkMode = true;
+      await wrapper.vm.$nextTick();
+
+      const appDiv = wrapper.find('#app');
+      expect(appDiv.classes()).toContain('dark-mode');
+    });
+
+    it('should pass isDarkMode prop to TimeTable', async () => {
+      const vm = wrapper.vm;
+
+      vm.isDarkMode = true;
+      await wrapper.vm.$nextTick();
+
+      const timeTable = wrapper.findComponent(TimeTable);
+      expect(timeTable.props('isDarkMode')).toBe(true);
+    });
+
+    it('should handle toggle-dark-mode event from TimeTable', async () => {
+      const timeTable = wrapper.findComponent(TimeTable);
+
+      expect(wrapper.vm.isDarkMode).toBe(false);
+
+      timeTable.vm.$emit('toggle-dark-mode');
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.isDarkMode).toBe(true);
+    });
+  });
 });

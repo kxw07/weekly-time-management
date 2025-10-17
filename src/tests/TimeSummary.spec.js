@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TimeSummary from '../components/TimeSummary.vue';
 
@@ -225,6 +225,87 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
       expect(summary).toHaveLength(2);
       const sleepItem = summary.find(item => item.field === 'Sleep');
       expect(sleepItem.count).toBe(2);
+    });
+  });
+
+  describe('Field Renaming', () => {
+    it('should emit rename-field event when field is renamed', async () => {
+      await wrapper.setProps({
+        cellData: {
+          'Monday-9': 'Sleep'
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8'
+        }
+      });
+
+      const vm = wrapper.vm;
+
+      // Mock the InputDialog
+      vm.$refs.inputDialog = {
+        show: vi.fn().mockResolvedValue('Sleeping')
+      };
+
+      await vm.handleFieldClick('Sleep');
+
+      expect(vm.$refs.inputDialog.show).toHaveBeenCalledWith('Rename Field', 'Sleep');
+      expect(wrapper.emitted('rename-field')).toBeTruthy();
+      expect(wrapper.emitted('rename-field')[0][0]).toEqual({
+        oldField: 'Sleep',
+        newField: 'Sleeping'
+      });
+    });
+
+    it('should not emit rename-field event when new name is empty', async () => {
+      const vm = wrapper.vm;
+
+      vm.$refs.inputDialog = {
+        show: vi.fn().mockResolvedValue('')
+      };
+
+      await vm.handleFieldClick('Sleep');
+
+      expect(wrapper.emitted('rename-field')).toBeFalsy();
+    });
+
+    it('should not emit rename-field event when new name is the same', async () => {
+      const vm = wrapper.vm;
+
+      vm.$refs.inputDialog = {
+        show: vi.fn().mockResolvedValue('Sleep')
+      };
+
+      await vm.handleFieldClick('Sleep');
+
+      expect(wrapper.emitted('rename-field')).toBeFalsy();
+    });
+
+    it('should not emit rename-field event when user cancels', async () => {
+      const vm = wrapper.vm;
+
+      vm.$refs.inputDialog = {
+        show: vi.fn().mockResolvedValue(null)
+      };
+
+      await vm.handleFieldClick('Sleep');
+
+      expect(wrapper.emitted('rename-field')).toBeFalsy();
+    });
+
+    it('should trim whitespace from new field name', async () => {
+      const vm = wrapper.vm;
+
+      vm.$refs.inputDialog = {
+        show: vi.fn().mockResolvedValue('  Sleeping  ')
+      };
+
+      await vm.handleFieldClick('Sleep');
+
+      expect(wrapper.emitted('rename-field')).toBeTruthy();
+      expect(wrapper.emitted('rename-field')[0][0]).toEqual({
+        oldField: 'Sleep',
+        newField: 'Sleeping'
+      });
     });
   });
 });

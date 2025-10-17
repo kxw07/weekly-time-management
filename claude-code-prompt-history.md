@@ -197,3 +197,6 @@ fix export png, it should not only export screen's view, but export all table's 
 
 ## 37
 fix "Time Summary"'s text color has no contrast problem when dark mode.
+
+## 38
+add unit test for business logic.

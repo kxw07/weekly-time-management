@@ -297,4 +297,235 @@ describe('TimeTable.vue - Business Logic Tests', () => {
       expect(wrapper.vm.contentColorMap).toEqual(newColorMap);
     });
   });
+
+  describe('Lock/Unlock Mode', () => {
+    it('should toggle lock mode when toggleLockMode is called', () => {
+      const vm = wrapper.vm;
+
+      expect(vm.isLocked).toBe(false);
+
+      vm.toggleLockMode();
+      expect(vm.isLocked).toBe(true);
+
+      vm.toggleLockMode();
+      expect(vm.isLocked).toBe(false);
+    });
+
+    it('should clear selection when entering lock mode', () => {
+      const vm = wrapper.vm;
+
+      vm.selectedCells = [
+        { day: 'Monday', hour: 9 },
+        { day: 'Tuesday', hour: 10 }
+      ];
+      vm.selectionStart = { day: 'Monday', hour: 9 };
+      vm.selectionEnd = { day: 'Tuesday', hour: 10 };
+
+      vm.toggleLockMode();
+
+      expect(vm.isLocked).toBe(true);
+      expect(vm.selectedCells).toEqual([]);
+      expect(vm.selectionStart).toBeNull();
+      expect(vm.selectionEnd).toBeNull();
+    });
+
+    it('should not trigger selection in lock mode', () => {
+      const vm = wrapper.vm;
+
+      vm.isLocked = true;
+      vm.handleMouseEnter('Monday', 9);
+
+      expect(vm.selectedCells).toEqual([]);
+    });
+
+    it('should prevent endSelection from showing dialog when locked', async () => {
+      const vm = wrapper.vm;
+
+      vm.isLocked = true;
+      vm.isSelecting = true;
+      vm.selectedCells = [{ day: 'Monday', hour: 9 }];
+
+      await vm.endSelection();
+
+      expect(vm.isSelecting).toBe(true);
+    });
+
+    it('should prevent touch selection when locked', () => {
+      const vm = wrapper.vm;
+
+      vm.isLocked = true;
+      const event = { preventDefault: vi.fn() };
+
+      vm.handleTouchStart('Monday', 9, event);
+
+      expect(vm.isSelecting).toBe(false);
+      expect(vm.selectedCells).toEqual([]);
+    });
+  });
+
+  describe('Dark Mode', () => {
+    it('should emit toggle-dark-mode event when toggleDarkMode is called', () => {
+      const vm = wrapper.vm;
+
+      vm.toggleDarkMode();
+
+      expect(wrapper.emitted('toggle-dark-mode')).toBeTruthy();
+      expect(wrapper.emitted('toggle-dark-mode')).toHaveLength(1);
+    });
+
+    it('should receive isDarkMode prop', async () => {
+      await wrapper.setProps({ isDarkMode: true });
+
+      expect(wrapper.vm.isDarkMode).toBe(true);
+    });
+
+    it('should apply dark-mode class when isDarkMode is true', async () => {
+      await wrapper.setProps({ isDarkMode: true });
+
+      const tableWrapper = wrapper.find('.table-wrapper');
+      expect(tableWrapper.classes()).toContain('dark-mode');
+    });
+
+    it('should not apply dark-mode class when isDarkMode is false', async () => {
+      await wrapper.setProps({ isDarkMode: false });
+
+      const tableWrapper = wrapper.find('.table-wrapper');
+      expect(tableWrapper.classes()).not.toContain('dark-mode');
+    });
+  });
+
+  describe('Scroll Buttons', () => {
+    it('should show scroll buttons when content exceeds container width', () => {
+      const vm = wrapper.vm;
+
+      // Mock container with scrollable content
+      const mockContainer = {
+        scrollWidth: 1000,
+        clientWidth: 500,
+        scrollLeft: 0,
+        scrollBy: vi.fn(),
+        scrollTo: vi.fn()
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+      vm.checkScrollable();
+
+      expect(vm.showScrollButtons).toBe(true);
+    });
+
+    it('should hide scroll buttons when content fits in container', () => {
+      const vm = wrapper.vm;
+
+      const mockContainer = {
+        scrollWidth: 500,
+        clientWidth: 500,
+        scrollLeft: 0
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+      vm.checkScrollable();
+
+      expect(vm.showScrollButtons).toBe(false);
+    });
+
+    it('should scroll left when scrollLeft is called', () => {
+      const vm = wrapper.vm;
+
+      const mockContainer = {
+        scrollLeft: 300,
+        scrollTo: vi.fn()
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+
+      const event = {
+        preventDefault: vi.fn(),
+        target: { blur: vi.fn() }
+      };
+
+      vm.scrollLeft(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(event.target.blur).toHaveBeenCalled();
+      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+        left: 100,
+        behavior: 'smooth'
+      });
+    });
+
+    it('should scroll right when scrollRight is called', () => {
+      const vm = wrapper.vm;
+
+      const mockContainer = {
+        scrollLeft: 100,
+        scrollWidth: 1000,
+        clientWidth: 500,
+        scrollTo: vi.fn()
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+
+      const event = {
+        preventDefault: vi.fn(),
+        target: { blur: vi.fn() }
+      };
+
+      vm.scrollRight(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(event.target.blur).toHaveBeenCalled();
+      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+        left: 300,
+        behavior: 'smooth'
+      });
+    });
+
+    it('should not scroll left beyond 0', () => {
+      const vm = wrapper.vm;
+
+      const mockContainer = {
+        scrollLeft: 50,
+        scrollTo: vi.fn()
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+
+      const event = {
+        preventDefault: vi.fn(),
+        target: { blur: vi.fn() }
+      };
+
+      vm.scrollLeft(event);
+
+      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+        left: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    it('should not scroll right beyond max scroll', () => {
+      const vm = wrapper.vm;
+
+      const mockContainer = {
+        scrollLeft: 450,
+        scrollWidth: 1000,
+        clientWidth: 500,
+        scrollTo: vi.fn()
+      };
+
+      vm.$refs.tableContainer = mockContainer;
+
+      const event = {
+        preventDefault: vi.fn(),
+        target: { blur: vi.fn() }
+      };
+
+      vm.scrollRight(event);
+
+      expect(mockContainer.scrollTo).toHaveBeenCalledWith({
+        left: 500,
+        behavior: 'smooth'
+      });
+    });
+  });
 });
