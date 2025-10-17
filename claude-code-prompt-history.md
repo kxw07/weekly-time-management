@@ -66,3 +66,8 @@ time to refactor, but before refactoring, we need to add some unit test.
 now, you cannot edit App.vue,
 and add tests for all business logic, but not UIUX,
 make an example: same field content should have same background color, time summary should correct.
+
+## 14
+we should refactor now,
+split App.vue to different components: title, table, time summary, actions.
+And do not modify unit tests, let them failed, it's okay.
