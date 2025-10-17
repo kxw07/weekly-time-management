@@ -1,5 +1,5 @@
 <template>
-  <div class="table-wrapper" :class="{ 'dark-mode': isDarkMode }">
+  <div class="table-wrapper" :class="{ 'dark-mode': isDarkMode }" :data-dark-mode="isDarkMode">
     <div class="table-container" ref="tableContainer">
       <table class="time-table">
       <thead>
@@ -82,9 +82,13 @@ export default {
     initialContentColorMap: {
       type: Object,
       default: () => ({})
+    },
+    isDarkMode: {
+      type: Boolean,
+      default: false
     }
   },
-  emits: ['data-change'],
+  emits: ['data-change', 'toggle-dark-mode'],
   data() {
     return {
       cellData: { ...this.initialCellData },
@@ -95,7 +99,6 @@ export default {
       selectedCells: [],
       showScrollButtons: false,
       isLocked: false,
-      isDarkMode: false,
       dragScrollStart: null,
       colorPalette: [
         '#B8D4E8',
@@ -364,7 +367,7 @@ export default {
       }
     },
     toggleDarkMode() {
-      this.isDarkMode = !this.isDarkMode;
+      this.$emit('toggle-dark-mode');
     }
   },
   mounted() {
@@ -385,6 +388,16 @@ export default {
   flex-direction: column;
   gap: 8px;
   transition: background-color 0.3s, color 0.3s;
+  padding: 12px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+.table-wrapper.dark-mode {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .control-buttons {

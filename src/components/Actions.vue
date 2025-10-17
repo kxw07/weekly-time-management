@@ -48,12 +48,23 @@ export default {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#app.dark-mode .actions-section {
+  background: #2e2e2e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .actions-section h2 {
   color: #333;
   margin-bottom: 8px;
   font-size: 16px;
+  transition: color 0.3s;
+}
+
+#app.dark-mode .actions-section h2 {
+  color: #e0e0e0;
 }
 
 .button-group {

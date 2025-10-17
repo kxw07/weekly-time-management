@@ -10,19 +10,23 @@
       >
         <span
           class="summary-field"
-          contenteditable="true"
-          @blur="handleFieldRename($event, item.field)"
-          @keydown.enter.prevent="$event.target.blur()"
+          @click="handleFieldClick(item.field)"
         >{{ item.field }}</span>
         <span class="summary-time">{{ item.count }} hr</span>
       </div>
     </div>
+    <InputDialog ref="inputDialog" />
   </div>
 </template>
 
 <script>
+import InputDialog from './InputDialog.vue';
+
 export default {
   name: 'TimeSummary',
+  components: {
+    InputDialog
+  },
   props: {
     cellData: {
       type: Object,
@@ -54,15 +58,17 @@ export default {
     }
   },
   methods: {
-    handleFieldRename(event, oldField) {
-      const newField = event.target.innerText.trim();
+    async handleFieldClick(oldField) {
+      const newField = await this.$refs.inputDialog.show(
+        'Rename Field',
+        oldField
+      );
 
-      if (newField === '' || newField === oldField) {
-        event.target.innerText = oldField;
+      if (newField === null || newField.trim() === '' || newField.trim() === oldField) {
         return;
       }
 
-      this.$emit('rename-field', { oldField, newField });
+      this.$emit('rename-field', { oldField, newField: newField.trim() });
     }
   }
 };
@@ -75,12 +81,23 @@ export default {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#app.dark-mode .footer-summary {
+  background: #242424;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .footer-summary h2 {
   color: #333;
   margin-bottom: 8px;
   font-size: 16px;
+  transition: color 0.3s;
+}
+
+#app.dark-mode .footer-summary h2 {
+  color: #e0e0e0;
 }
 
 .summary-items {
@@ -98,29 +115,44 @@ export default {
   border: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 13px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#app.dark-mode .summary-item {
+  border-color: #444;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .summary-field {
   font-weight: bold;
   color: #333;
-  cursor: text;
+  cursor: pointer;
   outline: none;
   border-radius: 2px;
   padding: 2px 4px;
   margin: -2px -4px;
+  transition: background-color 0.2s, color 0.3s;
+}
+
+#app.dark-mode .summary-field {
+  color: #e0e0e0;
 }
 
 .summary-field:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.summary-field:focus {
-  background-color: rgba(76, 175, 80, 0.1);
-  outline: 1px solid rgba(76, 175, 80, 0.3);
+#app.dark-mode .summary-field:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .summary-time {
   color: #666;
   font-size: 13px;
+  transition: color 0.3s;
+}
+
+#app.dark-mode .summary-time {
+  color: #b0b0b0;
 }
 </style>

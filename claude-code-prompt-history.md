@@ -179,3 +179,7 @@ when state is unlock then table can be edit, and drag's function same with it us
 
 ## 32
 let user can edit "Time Summary"'s field name, and it would adjust back to table content and would not change background color.
+
+## 33
+1. dark light mode should adjust all page, and make its color a little different from each page block.
+2. modify "Time Summary"s field, it should show inputDialog too.

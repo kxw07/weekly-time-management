@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ 'dark-mode': isDarkMode }">
     <PageTitle />
     <TimeTable
       ref="timeTable"
@@ -7,7 +7,9 @@
       :hours="hours"
       :initial-cell-data="cellData"
       :initial-content-color-map="contentColorMap"
+      :is-dark-mode="isDarkMode"
       @data-change="handleDataChange"
+      @toggle-dark-mode="toggleDarkMode"
     />
     <TimeSummary
       :cell-data="cellData"
@@ -43,7 +45,8 @@ export default {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       hours: Array.from({ length: 24 }, (_, i) => i),
       cellData: {},
-      contentColorMap: {}
+      contentColorMap: {},
+      isDarkMode: false
     };
   },
   methods: {
@@ -74,6 +77,10 @@ export default {
       this.contentColorMap = newContentColorMap;
       localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
       localStorage.setItem('weeklyTimeColors', JSON.stringify(this.contentColorMap));
+    },
+    toggleDarkMode() {
+      this.isDarkMode = !this.isDarkMode;
+      localStorage.setItem('darkMode', JSON.stringify(this.isDarkMode));
     },
     clearAll() {
       if (confirm('Are you sure you want to clear all content?')) {
@@ -180,6 +187,11 @@ export default {
     if (savedColors) {
       this.contentColorMap = JSON.parse(savedColors);
     }
+
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode) {
+      this.isDarkMode = JSON.parse(savedDarkMode);
+    }
   }
 };
 </script>
@@ -196,5 +208,15 @@ export default {
   padding: 8px;
   max-width: 100%;
   overflow-x: auto;
+  min-height: 100vh;
+  transition: background-color 0.3s;
+}
+
+#app.dark-mode {
+  background-color: #1a1a1a;
+}
+
+#app.dark-mode .header h1 {
+  color: #e0e0e0;
 }
 </style>
