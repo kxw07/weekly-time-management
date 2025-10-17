@@ -6,6 +6,11 @@ import TimeSummary from '../components/TimeSummary.vue';
 import Actions from '../components/Actions.vue';
 import PageTitle from '../components/PageTitle.vue';
 
+// Mock html2canvas module
+vi.mock('html2canvas', () => ({
+  default: vi.fn()
+}));
+
 describe('App.vue - Integration Tests', () => {
   let wrapper;
   let localStorageMock;
@@ -19,6 +24,11 @@ describe('App.vue - Integration Tests', () => {
       clear: vi.fn()
     };
     global.localStorage = localStorageMock;
+
+    // Mock other global functions
+    global.prompt = vi.fn();
+    global.confirm = vi.fn();
+    global.alert = vi.fn();
 
     wrapper = mount(App, {
       global: {
@@ -176,12 +186,13 @@ describe('App.vue - Integration Tests', () => {
     });
 
     it('should handle export-png event from Actions component', async () => {
+      const html2canvas = (await import('html2canvas')).default;
+
       // Mock html2canvas
       const mockCanvas = {
         toBlob: vi.fn((callback) => callback(new Blob()))
       };
-      const mockHtml2Canvas = vi.fn(() => Promise.resolve(mockCanvas));
-      vi.stubGlobal('html2canvas', mockHtml2Canvas);
+      html2canvas.mockResolvedValue(mockCanvas);
 
       // Mock URL methods
       global.URL.createObjectURL = vi.fn(() => 'mock-url');
@@ -199,7 +210,7 @@ describe('App.vue - Integration Tests', () => {
       actions.vm.$emit('export-png');
 
       await wrapper.vm.$nextTick();
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       expect(mockLink.click).toHaveBeenCalled();
       expect(mockLink.download).toContain('weekly-time-management');

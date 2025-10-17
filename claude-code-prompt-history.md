@@ -80,3 +80,7 @@ after modification, our unit tests should have some errors.
 
 ## 16
 fix unit tests, and do not modify production code.
+
+## 17
+still have some unit tests failed, fix them.
+and also remove REFACTORING md file.

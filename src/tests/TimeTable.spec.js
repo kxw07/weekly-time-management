@@ -8,6 +8,9 @@ describe('TimeTable.vue - Business Logic Tests', () => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   beforeEach(() => {
+    // Mock window.prompt for selection tests
+    global.prompt = vi.fn();
+
     wrapper = mount(TimeTable, {
       props: {
         days,
