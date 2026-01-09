@@ -12,7 +12,7 @@
           class="summary-field"
           @click="handleFieldClick(item.field)"
         >{{ item.field }}</span>
-        <span class="summary-time">{{ item.count }} hr</span>
+        <span class="summary-time">{{ item.hours }} hr</span>
       </div>
     </div>
     <InputDialog ref="inputDialog" />
@@ -35,26 +35,45 @@ export default {
     contentColorMap: {
       type: Object,
       required: true
+    },
+    timeStep: {
+      type: Number,
+      default: 60
     }
   },
   emits: ['rename-field'],
   computed: {
     timeSummary() {
       const summary = {};
+      const stepInHours = this.timeStep / 60;
 
-      Object.values(this.cellData).forEach(content => {
-        if (content && content.trim() !== '') {
-          summary[content] = (summary[content] || 0) + 1;
-        }
+      Object.entries(this.cellData).forEach(([key, content]) => {
+        if (!content || content.trim() === '') return;
+
+        // Parse hour from key (Day-Hour)
+        const lastDashIndex = key.lastIndexOf('-');
+        if (lastDashIndex === -1) return;
+        
+        const hourStr = key.substring(lastDashIndex + 1);
+        const hour = parseFloat(hourStr);
+        
+        if (isNaN(hour)) return;
+
+        // Check if hour aligns with current timeStep
+        // Using Math.round to avoid floating point precision issues
+        const totalMinutes = Math.round(hour * 60);
+        if (totalMinutes % this.timeStep !== 0) return;
+
+        summary[content] = (summary[content] || 0) + stepInHours;
       });
 
       return Object.entries(summary)
-        .map(([field, count]) => ({
+        .map(([field, hours]) => ({
           field,
-          count,
+          hours,
           color: this.contentColorMap[field] || 'transparent'
         }))
-        .sort((a, b) => b.count - a.count);
+        .sort((a, b) => b.hours - a.hours);
     }
   },
   methods: {

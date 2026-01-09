@@ -10,7 +10,7 @@
       </thead>
       <tbody>
         <tr v-for="hour in hours" :key="hour">
-          <td class="hour-cell">{{ hour }}</td>
+          <td class="hour-cell">{{ formatHour(hour) }}</td>
           <td
             v-for="day in days"
             :key="`${day}-${hour}`"
@@ -38,6 +38,14 @@
         <button class="scroll-btn scroll-right" @mousedown="scrollRight" @touchstart="scrollRight" aria-label="Scroll right">›</button>
       </div>
       <div class="mode-buttons">
+        <button
+          class="mode-btn"
+          @click="$emit('toggle-interval')"
+          :aria-label="'Switch to ' + (timeStep === 60 ? '30 min' : '1 hour') + ' interval'"
+          :title="'Switch to ' + (timeStep === 60 ? '30 min' : '1 hour') + ' interval'"
+        >
+          {{ timeStep === 60 ? '30m' : '1h' }}
+        </button>
         <button
           v-if="showScrollButtons"
           class="mode-btn"
@@ -75,6 +83,10 @@ export default {
       type: Array,
       required: true
     },
+    timeStep: {
+      type: Number,
+      default: 60
+    },
     initialCellData: {
       type: Object,
       default: () => ({})
@@ -88,7 +100,7 @@ export default {
       default: false
     }
   },
-  emits: ['data-change', 'toggle-dark-mode'],
+  emits: ['data-change', 'toggle-dark-mode', 'toggle-interval'],
   data() {
     return {
       cellData: { ...this.initialCellData },
@@ -131,6 +143,11 @@ export default {
     }
   },
   methods: {
+    formatHour(value) {
+      const hour = Math.floor(value);
+      const minute = Math.round((value - hour) * 60);
+      return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    },
     getCellContent(day, hour) {
       const key = `${day}-${hour}`;
       return this.cellData[key] || '';

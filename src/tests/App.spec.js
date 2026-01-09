@@ -60,6 +60,7 @@ describe('App.vue - Integration Tests', () => {
 
       expect(timeTable.props('days')).toEqual(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
       expect(timeTable.props('hours')).toHaveLength(24);
+      expect(timeTable.props('timeStep')).toBe(60);
       expect(timeTable.props('initialCellData')).toBeDefined();
       expect(timeTable.props('initialContentColorMap')).toBeDefined();
     });
@@ -76,10 +77,12 @@ describe('App.vue - Integration Tests', () => {
     it('should load data from localStorage on mount', () => {
       const savedData = { 'Monday-9': 'Sleep' };
       const savedColors = { 'Sleep': '#B8D4E8' };
+      const savedTimeStep = 30;
 
       localStorageMock.getItem.mockImplementation((key) => {
         if (key === 'weeklyTimeData') return JSON.stringify(savedData);
         if (key === 'weeklyTimeColors') return JSON.stringify(savedColors);
+        if (key === 'weeklyTimeStep') return JSON.stringify(savedTimeStep);
         return null;
       });
 
@@ -87,8 +90,10 @@ describe('App.vue - Integration Tests', () => {
 
       expect(localStorageMock.getItem).toHaveBeenCalledWith('weeklyTimeData');
       expect(localStorageMock.getItem).toHaveBeenCalledWith('weeklyTimeColors');
+      expect(localStorageMock.getItem).toHaveBeenCalledWith('weeklyTimeStep');
       expect(newWrapper.vm.cellData).toEqual(savedData);
       expect(newWrapper.vm.contentColorMap).toEqual(savedColors);
+      expect(newWrapper.vm.timeStep).toBe(30);
     });
 
     it('should save to localStorage when data changes', () => {
@@ -107,6 +112,54 @@ describe('App.vue - Integration Tests', () => {
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'weeklyTimeColors',
         JSON.stringify(newData.contentColorMap)
+      );
+    });
+
+    it('should save timeStep to localStorage when toggled', async () => {
+      const timeTable = wrapper.findComponent(TimeTable);
+      
+      timeTable.vm.$emit('toggle-interval');
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.timeStep).toBe(30);
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'weeklyTimeStep',
+        JSON.stringify(30)
+      );
+
+      timeTable.vm.$emit('toggle-interval');
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.timeStep).toBe(60);
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'weeklyTimeStep',
+        JSON.stringify(60)
+      );
+    });
+
+    it('should fill half-hour slots when switching from 60m to 30m', async () => {
+      // Setup initial state: 60m step, one cell filled
+      wrapper.vm.timeStep = 60;
+      wrapper.vm.cellData = {
+        'Monday-9': 'Work'
+      };
+      
+      const timeTable = wrapper.findComponent(TimeTable);
+      
+      // Toggle to 30m
+      timeTable.vm.$emit('toggle-interval');
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.timeStep).toBe(30);
+      
+      // Check if 9.5 is filled with 'Work'
+      expect(wrapper.vm.cellData['Monday-9']).toBe('Work');
+      expect(wrapper.vm.cellData['Monday-9.5']).toBe('Work');
+      
+      // Verify persistence
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'weeklyTimeData',
+        JSON.stringify(wrapper.vm.cellData)
       );
     });
 

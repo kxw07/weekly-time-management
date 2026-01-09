@@ -46,12 +46,12 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
       const workItem = summary.find(item => item.field === 'Work');
       const readingItem = summary.find(item => item.field === 'Reading');
 
-      expect(sleepItem.count).toBe(5);
-      expect(workItem.count).toBe(4);
-      expect(readingItem.count).toBe(2);
+      expect(sleepItem.hours).toBe(5);
+      expect(workItem.hours).toBe(4);
+      expect(readingItem.hours).toBe(2);
     });
 
-    it('should sort time summary by count in descending order', async () => {
+    it('should sort time summary by hours in descending order', async () => {
       await wrapper.setProps({
         cellData: {
           'Monday-9': 'Reading',
@@ -76,11 +76,55 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
 
       // Should be sorted: Sleep (5) > Work (3) > Reading (2)
       expect(summary[0].field).toBe('Sleep');
-      expect(summary[0].count).toBe(5);
+      expect(summary[0].hours).toBe(5);
       expect(summary[1].field).toBe('Work');
-      expect(summary[1].count).toBe(3);
+      expect(summary[1].hours).toBe(3);
       expect(summary[2].field).toBe('Reading');
-      expect(summary[2].count).toBe(2);
+      expect(summary[2].hours).toBe(2);
+    });
+
+    it('should correctly calculate hours with 30 min intervals', async () => {
+      await wrapper.setProps({
+        timeStep: 30,
+        cellData: {
+          'Monday-9': 'Sleep',   // 0.5 hr
+          'Monday-9.5': 'Sleep', // 0.5 hr
+          'Monday-10': 'Work'    // 0.5 hr
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8',
+          'Work': '#C8E6C9'
+        }
+      });
+
+      const summary = wrapper.vm.timeSummary;
+      const sleepItem = summary.find(item => item.field === 'Sleep');
+      const workItem = summary.find(item => item.field === 'Work');
+
+      expect(sleepItem.hours).toBe(1);
+      expect(workItem.hours).toBe(0.5);
+    });
+
+    it('should filter out invalid time slots based on timeStep', async () => {
+      await wrapper.setProps({
+        timeStep: 60, // Only integers allowed
+        cellData: {
+          'Monday-9': 'Sleep',   // Valid (1 hr)
+          'Monday-9.5': 'Sleep', // Invalid for 60m step
+          'Monday-10': 'Work'    // Valid (1 hr)
+        },
+        contentColorMap: {
+          'Sleep': '#B8D4E8',
+          'Work': '#C8E6C9'
+        }
+      });
+
+      const summary = wrapper.vm.timeSummary;
+      const sleepItem = summary.find(item => item.field === 'Sleep');
+      const workItem = summary.find(item => item.field === 'Work');
+
+      expect(sleepItem.hours).toBe(1);
+      expect(workItem.hours).toBe(1);
     });
 
     it('should include correct colors in time summary', async () => {
@@ -206,7 +250,7 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
 
       let summary = wrapper.vm.timeSummary;
       expect(summary).toHaveLength(1);
-      expect(summary[0].count).toBe(1);
+      expect(summary[0].hours).toBe(1);
 
       // Update props with more data
       await wrapper.setProps({
@@ -224,7 +268,7 @@ describe('TimeSummary.vue - Business Logic Tests', () => {
       summary = wrapper.vm.timeSummary;
       expect(summary).toHaveLength(2);
       const sleepItem = summary.find(item => item.field === 'Sleep');
-      expect(sleepItem.count).toBe(2);
+      expect(sleepItem.hours).toBe(2);
     });
   });
 

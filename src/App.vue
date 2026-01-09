@@ -5,15 +5,18 @@
       ref="timeTable"
       :days="days"
       :hours="hours"
+      :time-step="timeStep"
       :initial-cell-data="cellData"
       :initial-content-color-map="contentColorMap"
       :is-dark-mode="isDarkMode"
       @data-change="handleDataChange"
       @toggle-dark-mode="toggleDarkMode"
+      @toggle-interval="toggleInterval"
     />
     <TimeSummary
       :cell-data="cellData"
       :content-color-map="contentColorMap"
+      :time-step="timeStep"
       @rename-field="handleFieldRename"
     />
     <Actions
@@ -43,13 +46,60 @@ export default {
   data() {
     return {
       days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      hours: Array.from({ length: 24 }, (_, i) => i),
+      timeStep: 60,
       cellData: {},
       contentColorMap: {},
       isDarkMode: false
     };
   },
+  computed: {
+    hours() {
+      const slots = [];
+      const step = this.timeStep / 60;
+      for (let i = 0; i < 24; i += step) {
+        slots.push(i);
+      }
+      return slots;
+    }
+  },
   methods: {
+    toggleInterval() {
+      const oldStep = this.timeStep;
+      const newStep = oldStep === 60 ? 30 : 60;
+      this.timeStep = newStep;
+
+      if (oldStep === 60 && newStep === 30) {
+        const newCellData = { ...this.cellData };
+        let hasChanges = false;
+
+        Object.entries(this.cellData).forEach(([key, content]) => {
+          if (!content) return;
+
+          const lastDashIndex = key.lastIndexOf('-');
+          if (lastDashIndex === -1) return;
+
+          const day = key.substring(0, lastDashIndex);
+          const hourStr = key.substring(lastDashIndex + 1);
+          const hour = parseFloat(hourStr);
+
+          // If it is an integer hour (e.g., 9, 10), fill the half hour (e.g., 9.5, 10.5)
+          if (Number.isInteger(hour)) {
+            const halfHourKey = `${day}-${hour + 0.5}`;
+            if (!newCellData[halfHourKey]) {
+              newCellData[halfHourKey] = content;
+              hasChanges = true;
+            }
+          }
+        });
+
+        if (hasChanges) {
+          this.cellData = newCellData;
+          localStorage.setItem('weeklyTimeData', JSON.stringify(this.cellData));
+        }
+      }
+
+      localStorage.setItem('weeklyTimeStep', JSON.stringify(this.timeStep));
+    },
     handleDataChange({ cellData, contentColorMap }) {
       this.cellData = cellData;
       this.contentColorMap = contentColorMap;
@@ -197,6 +247,11 @@ export default {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
       this.isDarkMode = JSON.parse(savedDarkMode);
+    }
+
+    const savedTimeStep = localStorage.getItem('weeklyTimeStep');
+    if (savedTimeStep) {
+      this.timeStep = JSON.parse(savedTimeStep);
     }
   }
 };

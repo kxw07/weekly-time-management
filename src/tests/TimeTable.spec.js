@@ -394,6 +394,43 @@ describe('TimeTable.vue - Business Logic Tests', () => {
     });
   });
 
+  describe('Time Formatting', () => {
+    it('should format integer hours correctly', () => {
+      const vm = wrapper.vm;
+      expect(vm.formatHour(9)).toBe('09:00');
+      expect(vm.formatHour(0)).toBe('00:00');
+      expect(vm.formatHour(23)).toBe('23:00');
+    });
+
+    it('should format half hours correctly', () => {
+      const vm = wrapper.vm;
+      expect(vm.formatHour(9.5)).toBe('09:30');
+      expect(vm.formatHour(0.5)).toBe('00:30');
+      expect(vm.formatHour(23.5)).toBe('23:30');
+    });
+  });
+
+  describe('Interval Toggle', () => {
+    it('should emit toggle-interval event when button is clicked', async () => {
+      // Find the button that toggles interval.
+      // Since we rely on the button text "30m" or "1h", we need to check props.
+      // Default timeStep is 60, so button shows '30m'.
+      
+      const buttons = wrapper.findAll('.mode-btn');
+      // The first button is interval toggle (based on template order: interval, lock (conditional), dark mode)
+      // Note: Lock button has v-if="showScrollButtons". Default showScrollButtons is false.
+      // So buttons are: Interval, Dark Mode.
+      // Let's verify by text or aria-label.
+      
+      const intervalBtn = buttons.find(btn => btn.text() === '30m' || btn.text() === '1h');
+      expect(intervalBtn.exists()).toBe(true);
+
+      await intervalBtn.trigger('click');
+      expect(wrapper.emitted('toggle-interval')).toBeTruthy();
+      expect(wrapper.emitted('toggle-interval')).toHaveLength(1);
+    });
+  });
+
   describe('Scroll Buttons', () => {
     it('should show scroll buttons when content exceeds container width', () => {
       const vm = wrapper.vm;
