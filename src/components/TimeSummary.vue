@@ -127,7 +127,7 @@ export default {
 
 .summary-item {
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 8px;
   display: flex;
   gap: 6px;
   align-items: center;

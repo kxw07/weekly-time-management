@@ -441,7 +441,7 @@ export default {
   background-color: rgba(76, 175, 80, 0.15);
   color: #4CAF50;
   border: 1px solid rgba(76, 175, 80, 0.3);
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -470,7 +470,7 @@ export default {
   background-color: rgba(76, 175, 80, 0.15);
   color: #4CAF50;
   border: 1px solid rgba(76, 175, 80, 0.3);
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -497,6 +497,7 @@ export default {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .table-wrapper.dark-mode .table-container {
@@ -515,16 +516,27 @@ export default {
 
 .time-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: white;
 }
 
 .time-table th,
 .time-table td {
-  border: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   padding: 6px;
   text-align: center;
   font-size: 14px;
+}
+
+.time-table th:first-child,
+.time-table td:first-child {
+  border-left: 1px solid #ddd;
+}
+
+.time-table tr:first-child th {
+  border-top: 1px solid #ddd;
 }
 
 .time-table th {
@@ -591,10 +603,16 @@ export default {
 /* Dark mode styles */
 .table-wrapper.dark-mode .table-container {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
 }
 
 .table-wrapper.dark-mode .time-table {
   background: #2b2b2b;
+}
+
+.table-wrapper.dark-mode .time-table th,
+.table-wrapper.dark-mode .time-table td {
+  border-color: #555;
 }
 
 .table-wrapper.dark-mode .time-table th {
@@ -610,10 +628,6 @@ export default {
 .table-wrapper.dark-mode .hour-cell {
   background-color: #424242;
   color: #b0b0b0;
-}
-
-.table-wrapper.dark-mode .time-table td {
-  border-color: #555;
 }
 
 /* Empty cells should have light text in dark mode */

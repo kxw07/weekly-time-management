@@ -110,7 +110,7 @@ export default {
   padding: 10px 12px;
   font-size: 16px;
   border: 2px solid #ddd;
-  border-radius: 4px;
+  border-radius: 8px;
   box-sizing: border-box;
   transition: border-color 0.2s, background-color 0.3s, color 0.3s;
   background-color: white;
@@ -144,7 +144,7 @@ export default {
   font-size: 14px;
   font-weight: bold;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
 }

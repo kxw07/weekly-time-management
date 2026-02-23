@@ -25,6 +25,13 @@
       @import-json="importFromJson"
       @clear-all="clearAll"
     />
+    <footer class="app-footer">
+      <a href="https://github.com/kxw07/weekly-time-management" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="GitHub Repository">
+        <svg height="24" viewBox="0 0 16 16" width="24" class="github-icon">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+      </a>
+    </footer>
   </div>
 </template>
 
@@ -60,6 +67,11 @@ export default {
         slots.push(i);
       }
       return slots;
+    }
+  },
+  watch: {
+    isDarkMode(newVal) {
+      document.body.classList.toggle('dark-mode', newVal);
     }
   },
   methods: {
@@ -130,6 +142,7 @@ export default {
     },
     toggleDarkMode() {
       this.isDarkMode = !this.isDarkMode;
+      document.body.classList.toggle('dark-mode', this.isDarkMode);
       localStorage.setItem('darkMode', JSON.stringify(this.isDarkMode));
     },
     clearAll() {
@@ -247,6 +260,7 @@ export default {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
       this.isDarkMode = JSON.parse(savedDarkMode);
+      document.body.classList.toggle('dark-mode', this.isDarkMode);
     }
 
     const savedTimeStep = localStorage.getItem('weeklyTimeStep');
@@ -264,20 +278,66 @@ export default {
   box-sizing: border-box;
 }
 
+body {
+  transition: background-color 0.3s;
+  background-color: #f5f5f5;
+}
+
+body.dark-mode {
+  background-color: #121212;
+}
+
 #app {
   font-family: Arial, sans-serif;
-  padding: 8px;
-  max-width: 100%;
-  overflow-x: auto;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden;
   min-height: 100vh;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, border-radius 0.3s;
 }
 
 #app.dark-mode {
   background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  margin-top: 16px;
+  margin-bottom: 16px;
+  min-height: calc(100vh - 32px);
 }
 
 #app.dark-mode .header h1 {
   color: #e0e0e0;
+}
+
+.app-footer {
+  margin-top: 12px;
+  padding: 8px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.github-link {
+  color: #333;
+  transition: transform 0.2s, color 0.2s;
+  display: inline-flex;
+}
+
+.github-link:hover {
+  transform: scale(1.1);
+  color: #4CAF50;
+}
+
+.github-icon {
+  fill: currentColor;
+}
+
+#app.dark-mode .github-link {
+  color: #e0e0e0;
+}
+
+#app.dark-mode .github-link:hover {
+  color: #4CAF50;
 }
 </style>
