@@ -9,13 +9,10 @@
 ## 3. content time summary
 - summarize by different content
 
-## 4. cache in broswer storage
+## 4. cache in browser storage
 - refresh page can load data from cache
 
-## 5. deploy as a Github page
-- kxw07.github.io
-
-## 6. better RWD
+## 5. better RWD
 - desktop, mobile
 - table
 - button
